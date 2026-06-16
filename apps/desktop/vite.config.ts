@@ -6,6 +6,13 @@ export default defineConfig({
   root: 'src/renderer',
   base: './',
   plugins: [react()],
+  resolve: {
+    alias: {
+      '@socialkit/core': resolve(__dirname, '../../packages/core/src/index.ts'),
+      '@socialkit/ui': resolve(__dirname, '../../packages/ui/src/index.ts'),
+      '@socialkit/cli': resolve(__dirname, '../../packages/cli/src/index.ts'),
+    },
+  },
   build: {
     outDir: resolve(__dirname, 'dist/renderer'),
     emptyOutDir: true,
