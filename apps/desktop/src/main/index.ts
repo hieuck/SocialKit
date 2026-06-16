@@ -1,8 +1,9 @@
-import { app, BrowserWindow, ipcMain } from 'electron'
-import { Session, ProviderRegistry, Cli } from '@socialkit/cli'
+import { app, BrowserWindow, ipcMain, shell } from 'electron'
+import { Session, ProviderRegistry, Cli, loginCommand } from '@socialkit/cli'
 import { FacebookProvider } from '@socialkit/provider-facebook'
 import { InstagramProvider } from '@socialkit/provider-instagram'
 import { ZaloProvider } from '@socialkit/provider-zalo'
+import { createOAuthServer } from './oauth-server.js'
 import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
 import { homedir } from 'os'
@@ -71,6 +72,26 @@ ipcMain.handle('cli:run', async (_event, argv: string[]) => {
 
 ipcMain.handle('app:getPlatforms', () => {
   return ['facebook', 'instagram', 'zalo']
+})
+
+ipcMain.handle('oauth:login', async (_event, platform: string) => {
+  try {
+    const provider = cli['options']['registry'].get(platform)
+    if (!provider) return `Error: Unknown platform ${platform}`
+
+    const loginUrl = await loginCommand(provider, { scopes: ['public_profile', 'email'] })
+    const server = await createOAuthServer(3001)
+    await shell.openExternal(loginUrl)
+    const code = await server.waitForCode(120000)
+    server.close()
+
+    await loginCommand(provider, { code, redirectUri: `http://localhost:3001/callback` })
+    const token = provider.getAccessToken()
+    if (token) cli['options']['session'].save(platform, token)
+    return 'Logged in successfully.'
+  } catch (err) {
+    return `Error: ${err instanceof Error ? err.message : String(err)}`
+  }
 })
 
 app.whenReady().then(() => {

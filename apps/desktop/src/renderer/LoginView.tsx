@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { cliRun } from './api'
 
 interface Props {
   onResult: (msg: string) => void
@@ -7,52 +6,52 @@ interface Props {
 
 export default function LoginView({ onResult }: Props) {
   const [platform, setPlatform] = useState('facebook')
-  const [loginUrl, setLoginUrl] = useState('')
-  const [code, setCode] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const getUrl = async () => {
+  const login = async () => {
     setLoading(true)
-    const result = await cliRun(['login', platform])
-    setLoginUrl(result)
-    onResult(result)
-    setLoading(false)
-  }
-
-  const exchangeCode = async () => {
-    setLoading(true)
-    const result = await cliRun(['login', platform, '--code', code, '--redirectUri', 'http://localhost:3000/callback'])
-    onResult(result)
+    try {
+      const api = (window as any).socialkit
+      if (api?.login) {
+        const result = await api.login(platform)
+        onResult(result)
+      } else {
+        const result = await api.run(['login', platform])
+        onResult(`Open this URL in your browser:\n${result}`)
+      }
+    } catch (err) {
+      onResult(`Error: ${err instanceof Error ? err.message : String(err)}`)
+    }
     setLoading(false)
   }
 
   return (
     <div>
-      <label>
-        Platform:
-        <select value={platform} onChange={e => setPlatform(e.target.value)} style={{ marginLeft: 8 }}>
-          <option value="facebook">facebook</option>
-          <option value="instagram">instagram</option>
-          <option value="zalo">zalo</option>
-        </select>
-      </label>
-      <div style={{ marginTop: 12 }}>
-        <button onClick={getUrl} disabled={loading}>Get Login URL</button>
+      <div style={{ marginBottom: 16 }}>
+        <label>
+          Platform:
+          <select value={platform} onChange={e => setPlatform(e.target.value)} style={{ marginLeft: 8, padding: '4px 8px' }}>
+            <option value="facebook">Facebook</option>
+            <option value="instagram">Instagram</option>
+            <option value="zalo">Zalo</option>
+          </select>
+        </label>
       </div>
-      {loginUrl && (
-        <div style={{ marginTop: 12 }}>
-          <p style={{ background: '#f0f0f0', padding: 8, borderRadius: 4, wordBreak: 'break-all' }}>{loginUrl}</p>
-          <div style={{ marginTop: 8 }}>
-            <input
-              placeholder="Paste auth code here"
-              value={code}
-              onChange={e => setCode(e.target.value)}
-              style={{ width: 300, marginRight: 8 }}
-            />
-            <button onClick={exchangeCode} disabled={loading || !code}>Exchange Code</button>
-          </div>
-        </div>
-      )}
+      <button
+        onClick={login}
+        disabled={loading}
+        style={{
+          padding: '12px 24px',
+          fontSize: 16,
+          background: '#1877F2',
+          color: '#fff',
+          border: 'none',
+          borderRadius: 6,
+          cursor: 'pointer',
+        }}
+      >
+        {loading ? 'Opening browser...' : `Login with ${platform.charAt(0).toUpperCase() + platform.slice(1)}`}
+      </button>
     </div>
   )
 }
