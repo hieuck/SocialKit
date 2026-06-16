@@ -1,9 +1,11 @@
 export async function cliRun(argv: string[]): Promise<string> {
-  if (window.socialkit) return window.socialkit.run(argv)
+  const api = (window as any).socialkit
+  if (api) return api.run(argv)
   throw new Error('socialkit API not available (not running in Electron?)')
 }
 
 export async function getPlatforms(): Promise<string[]> {
-  if (window.socialkit) return window.socialkit.getPlatforms()
+  const api = (window as any).socialkit
+  if (api) return api.getPlatforms()
   return ['facebook', 'instagram', 'zalo']
 }

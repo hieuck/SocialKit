@@ -1,4 +1,7 @@
 import React, { useState } from 'react'
+import LoginView from './LoginView'
+import PostView from './PostView'
+import ScheduleView from './ScheduleView'
 
 type Tab = 'login' | 'post' | 'schedule'
 
@@ -32,9 +35,9 @@ export default function App() {
         ))}
       </nav>
       <div style={{ marginBottom: 16 }}>
-        {activeTab === 'login' && <div>Login view — select a platform to begin</div>}
-        {activeTab === 'post' && <div>Post view — publish to your page</div>}
-        {activeTab === 'schedule' && <div>Schedule view — manage scheduled tasks</div>}
+        {activeTab === 'login' && <LoginView onResult={setResult} />}
+        {activeTab === 'post' && <PostView onResult={setResult} />}
+        {activeTab === 'schedule' && <ScheduleView onResult={setResult} />}
       </div>
       {result && (
         <pre style={{ background: '#f5f5f5', padding: 12, borderRadius: 4, whiteSpace: 'pre-wrap' }}>
