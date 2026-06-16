@@ -13,7 +13,8 @@
       "@socialkit/provider-facebook": ["../../packages/providers/facebook/src/index.ts"],
       "@socialkit/provider-instagram": ["../../packages/providers/instagram/src/index.ts"],
       "@socialkit/provider-zalo": ["../../packages/providers/zalo/src/index.ts"],
-      "@socialkit/testing": ["../../packages/testing/src/index.ts"]
+      "@socialkit/testing": ["../../packages/testing/src/index.ts"],
+      "@socialkit/ui": ["../../packages/ui/src/index.ts"]
     }
   }
 }

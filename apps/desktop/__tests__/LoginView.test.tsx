@@ -26,7 +26,7 @@ beforeEach(() => {
 describe('LoginView', () => {
   it('renders platform selector', () => {
     render(<LoginView onResult={() => {}} />)
-    expect(screen.getByLabelText(/Platform/)).toBeInTheDocument()
+    expect(screen.getByLabelText('Platform')).toBeInTheDocument()
     expect(screen.getByText('Facebook')).toBeInTheDocument()
     expect(screen.getByText('Instagram')).toBeInTheDocument()
     expect(screen.getByText('Zalo')).toBeInTheDocument()

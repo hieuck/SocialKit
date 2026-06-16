@@ -11,7 +11,8 @@ module.exports = {
     '^@socialkit/provider-facebook$': '<rootDir>/../../packages/providers/facebook/src/index.ts',
     '^@socialkit/provider-instagram$': '<rootDir>/../../packages/providers/instagram/src/index.ts',
     '^@socialkit/provider-zalo$': '<rootDir>/../../packages/providers/zalo/src/index.ts',
-    '^@socialkit/testing$': '<rootDir>/../../packages/testing/src/index.ts'
+    '^@socialkit/testing$': '<rootDir>/../../packages/testing/src/index.ts',
+    '^@socialkit/ui$': '<rootDir>/../../packages/ui/src/index.ts'
   },
   transform: {
     '^.+\\.tsx?$': [
