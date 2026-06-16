@@ -11,7 +11,13 @@ export function parseArgs(argv: string[]): ParsedArgs {
   const cmd = argv[0]
 
   if (cmd === 'login') {
-    return { command: 'login', payload: { platform: argv[1] ?? '' } }
+    const payload: Record<string, string> = { platform: argv[1] ?? '' }
+    const remaining = argv.slice(2)
+    for (let i = 0; i < remaining.length; i += 2) {
+      const key = remaining[i].replace(/^--/, '')
+      payload[key] = remaining[i + 1] ?? ''
+    }
+    return { command: 'login', payload }
   }
 
   if (cmd === 'whoami') {

@@ -55,6 +55,7 @@ export class Cli {
       'Usage:',
       '  socialkit login <platform>              Show login URL',
       '  socialkit login <platform> --code <c>   Exchange code for token',
+      '  socialkit login <platform> --token <t>  Store token directly (no OAuth)',
       '  socialkit whoami                        Show current profile',
       '  socialkit post --page <id> --message <t> Publish a post',
       '  socialkit post --page <id> --message <t> --link <url>',
@@ -71,6 +72,13 @@ export class Cli {
     if (!platform) return 'Specify a platform: socialkit login facebook'
     const provider = this.options.registry.get(platform)
     if (!provider) return `Unknown platform: ${platform}`
+
+    if (payload.token) {
+      await loginCommand(provider, { token: payload.token })
+      const tok = provider.getAccessToken()
+      if (tok) this.options.session.save(platform, tok)
+      return 'Token stored.'
+    }
 
     if (payload.code) {
       await loginCommand(provider, { code: payload.code, redirectUri: payload.redirectUri || 'http://localhost:3000/callback' })
