@@ -1,0 +1,21 @@
+{
+  "name": "@socialkit/automation",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "test": "node --experimental-vm-modules --no-warnings ../../node_modules/jest/bin/jest.js --verbose",
+    "test:cov": "node --experimental-vm-modules --no-warnings ../../node_modules/jest/bin/jest.js --coverage",
+    "test:tdd": "node --experimental-vm-modules --no-warnings ../../node_modules/jest/bin/jest.js --watch",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@socialkit/core": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "@socialkit/testing": "workspace:*"
+  }
+}

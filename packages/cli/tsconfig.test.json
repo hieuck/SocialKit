@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "baseUrl": ".",
+    "paths": {
+      "@socialkit/core": ["../core/src/index.ts"],
+      "@socialkit/automation": ["../automation/src/index.ts"],
+      "@socialkit/testing": ["../testing/src/index.ts"]
+    }
+  }
+}
