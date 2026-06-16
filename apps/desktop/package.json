@@ -7,9 +7,10 @@
   "scripts": {
     "test": "node --experimental-vm-modules --no-warnings ../../node_modules/jest/bin/jest.js --verbose",
     "dev:renderer": "vite",
-    "dev": "vite & sleep 2 && electron .",
+    "dev": "concurrently --kill-others \"pnpm dev:renderer\" \"pnpm electron .\"",
     "build:renderer": "vite build",
-    "build": "tsc && vite build"
+    "build": "tsc && vite build",
+    "electron": "electron ."
   },
   "dependencies": {
     "@socialkit/analyzer": "workspace:*",
@@ -28,6 +29,7 @@
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^4.7.0",
+    "concurrently": "^10.0.3",
     "electron": "^42.0.0",
     "jest-environment-jsdom": "^30.4.1",
     "typescript": "^5.7.0",
