@@ -16,9 +16,11 @@ export default function LoginView({ onResult }: Props) {
       if (api?.login) {
         const result = await api.login(platform)
         onResult(result)
-      } else {
+      } else if (api?.run) {
         const result = await api.run(['login', platform])
         onResult(`Open this URL in your browser:\n${result}`)
+      } else {
+        onResult('socialkit API not available. Are you running in Electron?')
       }
     } catch (err) {
       onResult(`Error: ${err instanceof Error ? err.message : String(err)}`)
