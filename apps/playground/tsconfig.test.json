@@ -1,0 +1,18 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "baseUrl": ".",
+    "paths": {
+      "@socialkit/core": ["../../packages/core/src/index.ts"],
+      "@socialkit/automation": ["../../packages/automation/src/index.ts"],
+      "@socialkit/analyzer": ["../../packages/analyzer/src/index.ts"],
+      "@socialkit/cli": ["../../packages/cli/src/index.ts"],
+      "@socialkit/provider-facebook": ["../../packages/providers/facebook/src/index.ts"],
+      "@socialkit/provider-instagram": ["../../packages/providers/instagram/src/index.ts"],
+      "@socialkit/provider-zalo": ["../../packages/providers/zalo/src/index.ts"],
+      "@socialkit/testing": ["../../packages/testing/src/index.ts"]
+    }
+  }
+}
