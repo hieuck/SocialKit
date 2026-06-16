@@ -10,18 +10,23 @@
     "build": "tsc && echo \"Build desktop done\""
   },
   "dependencies": {
-    "@socialkit/core": "workspace:*",
-    "@socialkit/automation": "workspace:*",
     "@socialkit/analyzer": "workspace:*",
-    "@socialkit/cli": "workspace:*"
+    "@socialkit/automation": "workspace:*",
+    "@socialkit/cli": "workspace:*",
+    "@socialkit/core": "workspace:*"
   },
   "devDependencies": {
-    "typescript": "^5.7.0",
-    "electron": "^42.0.0",
-    "@types/node": "^22.0.0",
-    "@socialkit/testing": "workspace:*",
     "@socialkit/provider-facebook": "workspace:*",
     "@socialkit/provider-instagram": "workspace:*",
-    "@socialkit/provider-zalo": "workspace:*"
+    "@socialkit/provider-zalo": "workspace:*",
+    "@socialkit/testing": "workspace:*",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "electron": "^42.0.0",
+    "jest-environment-jsdom": "^30.4.1",
+    "typescript": "^5.7.0"
   }
 }
