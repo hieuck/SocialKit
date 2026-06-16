@@ -15,15 +15,16 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@socialkit/core": "workspace:*",
     "@socialkit/automation": "workspace:*",
+    "@socialkit/core": "workspace:*",
     "@socialkit/provider-facebook": "workspace:*",
     "@socialkit/provider-instagram": "workspace:*",
-    "@socialkit/provider-zalo": "workspace:*"
+    "@socialkit/provider-zalo": "workspace:*",
+    "playwright": "^1.61.0"
   },
   "devDependencies": {
-    "typescript": "^5.7.0",
+    "@socialkit/testing": "workspace:*",
     "@types/node": "^22.0.0",
-    "@socialkit/testing": "workspace:*"
+    "typescript": "^5.7.0"
   }
 }

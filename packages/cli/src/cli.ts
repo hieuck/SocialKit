@@ -9,6 +9,7 @@ import { scheduleCommand } from './schedule.js'
 import { daemonCommand } from './daemon.js'
 import { configureCommand } from './configure.js'
 import { Config } from './config.js'
+import { autoLoginFacebook } from './auto-login.js'
 
 export interface CliOptions {
   session: Session
@@ -54,6 +55,7 @@ export class Cli {
       '',
       'Usage:',
       '  socialkit login <platform>              Show login URL',
+      '  socialkit login <platform> --auto       Auto-login via browser (Playwright)',
       '  socialkit login <platform> --code <c>   Exchange code for token',
       '  socialkit login <platform> --token <t>  Store token directly (no OAuth)',
       '  socialkit whoami                        Show current profile',
@@ -72,6 +74,16 @@ export class Cli {
     if (!platform) return 'Specify a platform: socialkit login facebook'
     const provider = this.options.registry.get(platform)
     if (!provider) return `Unknown platform: ${platform}`
+
+    if (payload.auto) {
+      const result = await autoLoginFacebook({
+        email: process.env.SOCIALKIT_EMAIL,
+        password: process.env.SOCIALKIT_PASSWORD,
+      })
+      provider.setAccessToken(result.accessToken)
+      this.options.session.save(platform, result.accessToken)
+      return `Logged in via browser. Token: ${result.accessToken.slice(0, 20)}...`
+    }
 
     if (payload.token) {
       await loginCommand(provider, { token: payload.token })
