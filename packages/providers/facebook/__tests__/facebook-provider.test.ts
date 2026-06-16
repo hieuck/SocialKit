@@ -186,4 +186,49 @@ describe('FacebookProvider', () => {
     const result = await provider.getProfile()
     expect(result.name).toBe('Test')
   })
+
+  it('gets profile with explicit userId', async () => {
+    nock('https://graph.facebook.com')
+      .get('/v22.0/user_456')
+      .query({ access_token: 'tok' })
+      .reply(200, { id: '456', name: 'Bob', email: 'b@b.com' })
+
+    provider.setAccessToken('tok')
+    const result = await provider.getProfile('user_456')
+    expect(result.id).toBe('456')
+    expect(result.name).toBe('Bob')
+  })
+
+  it('publishes post with link', async () => {
+    nock('https://graph.facebook.com')
+      .post('/v22.0/page1/feed', { message: 'Check this', link: 'https://example.com' })
+      .query({ access_token: 'tok' })
+      .reply(200, { id: 'post_link_1' })
+
+    provider.setAccessToken('tok')
+    const result = await provider.publishPost('page1', { message: 'Check this', link: 'https://example.com' })
+    expect(result.id).toBe('post_link_1')
+  })
+
+  it('throws AuthError on 401', async () => {
+    nock('https://graph.facebook.com')
+      .get('/v22.0/me')
+      .query(true)
+      .reply(401, { error: { message: 'invalid token', code: 401, type: 'OAuthException' } })
+
+    provider.setAccessToken('tok')
+    await expect(provider.getProfile()).rejects.toThrow('invalid token')
+  })
+
+  it('handles pagination cursor on getPagePosts', async () => {
+    nock('https://graph.facebook.com')
+      .get('/v22.0/page1/posts')
+      .query({ access_token: 'tok', cursor: 'next_page' })
+      .reply(200, { data: [{ id: 'p2', message: 'Page 2', created_time: '2024-01-02' }] })
+
+    provider.setAccessToken('tok')
+    const result = await provider.getPagePosts('page1', 'next_page')
+    expect(result.data).toHaveLength(1)
+    expect(result.data[0].id).toBe('p2')
+  })
 })
