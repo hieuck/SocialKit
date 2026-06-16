@@ -75,7 +75,7 @@ export class Cli {
     const provider = this.options.registry.get(platform)
     if (!provider) return `Unknown platform: ${platform}`
 
-    if (payload.auto) {
+    if (payload.auto !== undefined) {
       const result = await autoLoginFacebook({
         email: process.env.SOCIALKIT_EMAIL,
         password: process.env.SOCIALKIT_PASSWORD,
