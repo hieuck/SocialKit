@@ -24,6 +24,7 @@ function createWindow(): void {
       preload: join(__dirname, '../preload/index.js'),
       contextIsolation: true,
       nodeIntegration: false,
+      webviewTag: true,
     },
   })
 
@@ -89,6 +90,16 @@ ipcMain.handle('oauth:login', async (_event, platform: string) => {
     const token = provider.getAccessToken()
     if (token) cli['options']['session'].save(platform, token)
     return 'Logged in successfully.'
+  } catch (err) {
+    return `Error: ${err instanceof Error ? err.message : String(err)}`
+  }
+})
+
+ipcMain.handle('oauth:getLoginUrl', async (_event, platform: string) => {
+  try {
+    const provider = cli['options']['registry'].get(platform)
+    if (!provider) return `Error: Unknown platform ${platform}`
+    return await loginCommand(provider, { scopes: ['public_profile', 'email'] })
   } catch (err) {
     return `Error: ${err instanceof Error ? err.message : String(err)}`
   }

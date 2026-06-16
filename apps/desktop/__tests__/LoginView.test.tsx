@@ -11,6 +11,7 @@ declare global {
       run: jest.Mock
       getPlatforms: jest.Mock
       login: jest.Mock
+      getLoginUrl: jest.Mock
     }
   }
 }
@@ -20,6 +21,7 @@ beforeEach(() => {
     run: jest.fn().mockResolvedValue('mock result'),
     getPlatforms: jest.fn().mockResolvedValue(['facebook', 'instagram', 'zalo']),
     login: jest.fn().mockResolvedValue('Logged in successfully.'),
+    getLoginUrl: jest.fn().mockResolvedValue('https://facebook.mock/login'),
   }
 })
 
@@ -32,18 +34,11 @@ describe('LoginView', () => {
     expect(screen.getByText('Zalo')).toBeInTheDocument()
   })
 
-  it('calls socialkit.login on button click', () => {
-    render(<LoginView onResult={() => {}} />)
-    fireEvent.click(screen.getByText(/Login with/))
-    expect((window as any).socialkit.login).toHaveBeenCalledWith('facebook')
-  })
-
-  it('calls onResult with success message', async () => {
-    const onResult = jest.fn()
-    ;(window as any).socialkit.login = jest.fn().mockResolvedValue('Logged in successfully.')
-    render(<LoginView onResult={onResult} />)
+  it('calls onOpenBrowser when getLoginUrl succeeds', async () => {
+    const onOpenBrowser = jest.fn()
+    render(<LoginView onResult={() => {}} onOpenBrowser={onOpenBrowser} />)
     fireEvent.click(screen.getByText(/Login with/))
     await new Promise(r => setTimeout(r, 50))
-    expect(onResult).toHaveBeenCalledWith('Logged in successfully.')
+    expect(onOpenBrowser).toHaveBeenCalledWith('https://facebook.mock/login')
   })
 })

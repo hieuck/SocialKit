@@ -30,13 +30,13 @@ describe('App', () => {
 
   it('switches to post view on sidebar click', () => {
     render(<App />)
-    fireEvent.click(screen.getByText('📝 Post'))
+    fireEvent.click(screen.getByText('Post'))
     expect(screen.getByText(/Publish a new post/)).toBeInTheDocument()
   })
 
   it('switches to schedule view on sidebar click', () => {
     render(<App />)
-    fireEvent.click(screen.getByText('📅 Schedule'))
+    fireEvent.click(screen.getByText('Schedule'))
     expect(screen.getByText(/Schedule a post/)).toBeInTheDocument()
   })
 })

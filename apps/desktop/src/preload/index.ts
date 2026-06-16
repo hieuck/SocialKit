@@ -4,4 +4,5 @@ contextBridge.exposeInMainWorld('socialkit', {
   run: (argv: string[]) => ipcRenderer.invoke('cli:run', argv),
   getPlatforms: () => ipcRenderer.invoke('app:getPlatforms'),
   login: (platform: string) => ipcRenderer.invoke('oauth:login', platform),
+  getLoginUrl: (platform: string) => ipcRenderer.invoke('oauth:getLoginUrl', platform),
 })

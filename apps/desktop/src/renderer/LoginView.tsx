@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
-import { cliRun } from './api'
 
 interface Props {
   onResult: (msg: string) => void
+  onOpenBrowser?: (url: string) => void
 }
 
-export default function LoginView({ onResult }: Props) {
+export default function LoginView({ onResult, onOpenBrowser }: Props) {
   const [platform, setPlatform] = useState('facebook')
   const [loading, setLoading] = useState(false)
 
@@ -13,6 +13,16 @@ export default function LoginView({ onResult }: Props) {
     setLoading(true)
     try {
       const api = (window as any).socialkit
+
+      if (api?.getLoginUrl) {
+        const url = await api.getLoginUrl(platform)
+        if (onOpenBrowser) {
+          onOpenBrowser(url)
+          onResult('Browser opened. Log in to Facebook in the panel on the left.')
+          return
+        }
+      }
+
       if (api?.login) {
         const result = await api.login(platform)
         onResult(result)
@@ -33,6 +43,7 @@ export default function LoginView({ onResult }: Props) {
       <h3 style={{ margin: '0 0 8px' }}>Login</h3>
       <p style={{ color: '#666', marginBottom: 16 }}>
         Select a platform and click the button to authenticate.
+        The login page will open in the embedded browser panel.
       </p>
       <div style={{ marginBottom: 16 }}>
         <span style={{ fontWeight: 500, marginRight: 8 }}>Platform:</span>

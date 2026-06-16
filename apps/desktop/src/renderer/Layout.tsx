@@ -1,4 +1,5 @@
 import React from 'react'
+import BrowserPanel from './BrowserPanel'
 
 const styles = {
   container: {
@@ -8,7 +9,7 @@ const styles = {
     color: '#1a1a1a',
   },
   sidebar: {
-    width: 220,
+    width: 180,
     background: '#1a1a2e',
     color: '#fff',
     padding: '20px 0',
@@ -16,24 +17,27 @@ const styles = {
     flexDirection: 'column' as const,
   },
   logo: {
-    padding: '0 20px 24px',
-    fontSize: 20,
+    padding: '0 16px 24px',
+    fontSize: 18,
     fontWeight: 'bold',
     borderBottom: '1px solid rgba(255,255,255,0.1)',
     marginBottom: 8,
   },
   navItem: (active: boolean) => ({
-    padding: '12px 20px',
+    padding: '10px 16px',
     cursor: 'pointer',
     background: active ? 'rgba(255,255,255,0.1)' : 'transparent',
     borderLeft: active ? '3px solid #4a9eff' : '3px solid transparent',
     color: active ? '#fff' : 'rgba(255,255,255,0.7)',
-    fontSize: 14,
-    transition: 'all 0.2s',
+    fontSize: 13,
   }),
+  browserPanel: {
+    width: '50%' as const,
+    minWidth: 400,
+  },
   content: {
     flex: 1,
-    padding: 32,
+    padding: 24,
     overflow: 'auto',
     background: '#f5f6fa',
   },
@@ -46,7 +50,6 @@ const styles = {
     whiteSpace: 'pre-wrap' as const,
     fontFamily: 'monospace',
     fontSize: 13,
-    lineHeight: 1.5,
   },
 }
 
@@ -55,15 +58,18 @@ interface LayoutProps {
   onTabChange: (tab: string) => void
   children: React.ReactNode
   result: string
+  browserUrl?: string
+  onBrowserUrlChange?: (url: string) => void
+  onBrowserClose?: () => void
 }
 
 const tabs = [
-  { id: 'login', label: 'Login', icon: '🔑' },
-  { id: 'post', label: 'Post', icon: '📝' },
-  { id: 'schedule', label: 'Schedule', icon: '📅' },
+  { id: 'login', label: 'Login' },
+  { id: 'post', label: 'Post' },
+  { id: 'schedule', label: 'Schedule' },
 ]
 
-export function Layout({ activeTab, onTabChange, children, result }: LayoutProps) {
+export function Layout({ activeTab, onTabChange, children, result, browserUrl, onBrowserUrlChange, onBrowserClose }: LayoutProps) {
   return (
     <div style={styles.container}>
       <div style={styles.sidebar}>
@@ -74,10 +80,20 @@ export function Layout({ activeTab, onTabChange, children, result }: LayoutProps
             style={styles.navItem(activeTab === tab.id)}
             onClick={() => onTabChange(tab.id)}
           >
-            {tab.icon} {tab.label}
+            {tab.label}
           </div>
         ))}
       </div>
+      {browserUrl && (
+        <div style={styles.browserPanel}>
+          <BrowserPanel
+            url={browserUrl}
+            onUrlChange={onBrowserUrlChange}
+            visible={true}
+            onClose={onBrowserClose || (() => {})}
+          />
+        </div>
+      )}
       <div style={styles.content}>
         {children}
         {result && <div style={styles.result}>{result}</div>}
