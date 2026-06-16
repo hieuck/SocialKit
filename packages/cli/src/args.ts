@@ -1,4 +1,4 @@
-export type CliCommand = 'login' | 'whoami' | 'post' | 'schedule' | 'daemon' | 'help'
+export type CliCommand = 'login' | 'whoami' | 'post' | 'schedule' | 'daemon' | 'configure' | 'help'
 
 export interface ParsedArgs {
   command: CliCommand
@@ -30,6 +30,17 @@ export function parseArgs(argv: string[]): ParsedArgs {
 
   if (cmd === 'daemon') {
     return { command: 'daemon', payload: { platform: argv[1] ?? '' } }
+  }
+
+  if (cmd === 'configure') {
+    return {
+      command: 'configure',
+      payload: {
+        platform: argv[1] ?? '',
+        key: argv[2] ?? '',
+        value: argv[3] ?? '',
+      },
+    }
   }
 
   return { command: 'help', payload: {} }

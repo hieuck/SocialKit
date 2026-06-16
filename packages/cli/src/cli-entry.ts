@@ -2,6 +2,7 @@
 
 import { Cli } from './cli.js'
 import { Session } from './session.js'
+import { Config } from './config.js'
 import { ProviderRegistry } from './registry.js'
 import { FacebookProvider } from '@socialkit/provider-facebook'
 import { InstagramProvider } from '@socialkit/provider-instagram'
@@ -13,38 +14,45 @@ import { existsSync, mkdirSync } from 'fs'
 export interface MainOptions {
   argv?: string[]
   sessionPath?: string
-  env?: Record<string, string | undefined>
+  configPath?: string
+}
+
+export function getDataDir(): string {
+  const dir = join(homedir(), '.socialkit')
+  if (!existsSync(dir)) mkdirSync(dir, { recursive: true })
+  return dir
 }
 
 export function getSessionPath(sessionPath?: string): string {
-  if (sessionPath) return sessionPath
-  const dir = join(homedir(), '.socialkit')
-  if (!existsSync(dir)) mkdirSync(dir, { recursive: true })
-  return join(dir, 'session.json')
+  return sessionPath ?? join(getDataDir(), 'session.json')
 }
 
-export function createRegistry(): ProviderRegistry {
+export function getConfigPath(configPath?: string): string {
+  return configPath ?? join(getDataDir(), 'config.json')
+}
+
+export function createRegistry(config: Config): ProviderRegistry {
   const registry = new ProviderRegistry()
 
   registry.register('facebook', () => {
     return new FacebookProvider({
-      appId: process.env.SOCIALKIT_FACEBOOK_APP_ID || '',
-      appSecret: process.env.SOCIALKIT_FACEBOOK_APP_SECRET || '',
+      appId: config.get('facebook', 'appId') || process.env.SOCIALKIT_FACEBOOK_APP_ID || '',
+      appSecret: config.get('facebook', 'appSecret') || process.env.SOCIALKIT_FACEBOOK_APP_SECRET || '',
     })
   })
 
   registry.register('instagram', () => {
     return new InstagramProvider({
-      appId: process.env.SOCIALKIT_INSTAGRAM_APP_ID || '',
-      appSecret: process.env.SOCIALKIT_INSTAGRAM_APP_SECRET || '',
-      igUserId: process.env.SOCIALKIT_INSTAGRAM_IG_USER_ID || '',
+      appId: config.get('instagram', 'appId') || process.env.SOCIALKIT_INSTAGRAM_APP_ID || '',
+      appSecret: config.get('instagram', 'appSecret') || process.env.SOCIALKIT_INSTAGRAM_APP_SECRET || '',
+      igUserId: config.get('instagram', 'igUserId') || process.env.SOCIALKIT_INSTAGRAM_IG_USER_ID || '',
     })
   })
 
   registry.register('zalo', () => {
     return new ZaloProvider({
-      appId: process.env.SOCIALKIT_ZALO_APP_ID || '',
-      appSecret: process.env.SOCIALKIT_ZALO_APP_SECRET || '',
+      appId: config.get('zalo', 'appId') || process.env.SOCIALKIT_ZALO_APP_ID || '',
+      appSecret: config.get('zalo', 'appSecret') || process.env.SOCIALKIT_ZALO_APP_SECRET || '',
     })
   })
 
@@ -53,14 +61,15 @@ export function createRegistry(): ProviderRegistry {
 
 export async function main(options: MainOptions = {}): Promise<string> {
   const sessionPath = getSessionPath(options.sessionPath)
+  const configPath = getConfigPath(options.configPath)
   const session = new Session(sessionPath)
-  const registry = createRegistry()
-  const cli = new Cli({ session, registry })
+  const config = new Config(configPath)
+  const registry = createRegistry(config)
+  const cli = new Cli({ session, registry, config })
   const argv = options.argv ?? process.argv.slice(2)
   return cli.run(argv)
 }
 
-// Self-execution check
 if (process.argv[1]?.endsWith('cli-entry.ts') || process.argv[1]?.endsWith('cli-entry.js')) {
   main().then(result => {
     console.log(result)

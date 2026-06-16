@@ -7,10 +7,13 @@ import { whoamiCommand } from './whoami.js'
 import { postCommand } from './post.js'
 import { scheduleCommand } from './schedule.js'
 import { daemonCommand } from './daemon.js'
+import { configureCommand } from './configure.js'
+import { Config } from './config.js'
 
 export interface CliOptions {
   session: Session
   registry: ProviderRegistry
+  config?: Config
 }
 
 export class Cli {
@@ -36,6 +39,8 @@ export class Cli {
           return await this.handleSchedule(parsed.payload, provider)
         case 'daemon':
           return this.handleDaemon(parsed.payload, provider)
+        case 'configure':
+          return this.handleConfigure(parsed.payload)
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err)
@@ -57,6 +62,8 @@ export class Cli {
       '  socialkit schedule list                 List scheduled tasks',
       '  socialkit schedule cancel <id>          Cancel a task',
       '  socialkit daemon                        Run daemon for pending tasks',
+      '  socialkit configure <platform>          Show platform config',
+      '  socialkit configure <platform> <k> <v>  Set config value',
     ].join('\n')
   }
 
@@ -101,5 +108,14 @@ export class Cli {
     if (!provider) return 'Not logged in.'
     const result = daemonCommand(provider, {})
     return result.message
+  }
+
+  private handleConfigure(payload: Record<string, string>): string {
+    if (!this.options.config) return 'Config not available.'
+    return configureCommand(this.options.config, {
+      platform: payload.platform || undefined,
+      key: payload.key || undefined,
+      value: payload.value || undefined,
+    })
   }
 }
