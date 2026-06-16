@@ -7,6 +7,9 @@
     "paths": {
       "@socialkit/core": ["../core/src/index.ts"],
       "@socialkit/automation": ["../automation/src/index.ts"],
+      "@socialkit/provider-facebook": ["../providers/facebook/src/index.ts"],
+      "@socialkit/provider-instagram": ["../providers/instagram/src/index.ts"],
+      "@socialkit/provider-zalo": ["../providers/zalo/src/index.ts"],
       "@socialkit/testing": ["../testing/src/index.ts"]
     }
   }

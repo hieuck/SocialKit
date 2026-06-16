@@ -6,6 +6,9 @@ module.exports = {
     '^(\\.\\.?/.*)\\.js$': '$1',
     '^@socialkit/core$': '<rootDir>/../core/src/index.ts',
     '^@socialkit/automation$': '<rootDir>/../automation/src/index.ts',
+    '^@socialkit/provider-facebook$': '<rootDir>/../providers/facebook/src/index.ts',
+    '^@socialkit/provider-instagram$': '<rootDir>/../providers/instagram/src/index.ts',
+    '^@socialkit/provider-zalo$': '<rootDir>/../providers/zalo/src/index.ts',
     '^@socialkit/testing$': '<rootDir>/../testing/src/index.ts'
   },
   transform: {

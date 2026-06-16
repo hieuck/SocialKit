@@ -118,6 +118,15 @@ importers:
       '@socialkit/core':
         specifier: workspace:*
         version: link:../core
+      '@socialkit/provider-facebook':
+        specifier: workspace:*
+        version: link:../providers/facebook
+      '@socialkit/provider-instagram':
+        specifier: workspace:*
+        version: link:../providers/instagram
+      '@socialkit/provider-zalo':
+        specifier: workspace:*
+        version: link:../providers/zalo
     devDependencies:
       '@socialkit/testing':
         specifier: workspace:*

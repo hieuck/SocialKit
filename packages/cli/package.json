@@ -6,7 +6,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "socialkit": "./dist/index.js"
+    "socialkit": "./dist/cli-entry.js"
   },
   "scripts": {
     "test": "node --experimental-vm-modules --no-warnings ../../node_modules/jest/bin/jest.js --verbose",
@@ -16,7 +16,10 @@
   },
   "dependencies": {
     "@socialkit/core": "workspace:*",
-    "@socialkit/automation": "workspace:*"
+    "@socialkit/automation": "workspace:*",
+    "@socialkit/provider-facebook": "workspace:*",
+    "@socialkit/provider-instagram": "workspace:*",
+    "@socialkit/provider-zalo": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.7.0",
