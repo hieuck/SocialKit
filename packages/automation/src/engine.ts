@@ -1,5 +1,5 @@
 import { SocialProvider } from '@socialkit/core'
-import { Scheduler, ScheduledTask } from './scheduler.js'
+import { Scheduler, type SchedulerOptions, type ScheduledTask } from './scheduler.js'
 
 export interface PostInput {
   pageId: string
@@ -27,8 +27,8 @@ export interface LikeInput {
 export class AutomationEngine {
   private scheduler: Scheduler
 
-  constructor(_provider: SocialProvider) {
-    this.scheduler = new Scheduler()
+  constructor(_provider: SocialProvider, options?: SchedulerOptions) {
+    this.scheduler = new Scheduler(options)
   }
 
   schedulePost(input: PostInput): ScheduledTask {

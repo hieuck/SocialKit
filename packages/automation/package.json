@@ -15,7 +15,8 @@
     "@socialkit/core": "workspace:*"
   },
   "devDependencies": {
-    "typescript": "^5.7.0",
-    "@socialkit/testing": "workspace:*"
+    "@socialkit/testing": "workspace:*",
+    "@types/node": "^22.19.21",
+    "typescript": "^5.7.0"
   }
 }

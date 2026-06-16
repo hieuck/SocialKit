@@ -1,32 +1,11 @@
-export type TaskType = 'post' | 'comment' | 'like'
+import { TaskStore } from './task-store.js'
+import type { ScheduledTask, ScheduleInput, TaskType, TaskStatus, TaskCallback } from './task-types.js'
 
-export type TaskStatus = 'pending' | 'done' | 'failed'
-
-export interface ScheduledTask {
-  id: string
-  type: TaskType
-  pageId: string
-  postId?: string
-  payload?: Record<string, unknown>
-  cron?: string
-  runAt?: Date
-  status: TaskStatus
-  error?: string
-}
-
-export interface ScheduleInput {
-  type: TaskType
-  pageId: string
-  postId?: string
-  payload?: Record<string, unknown>
-  cron?: string
-  runAt?: Date
-}
-
-export type TaskCallback = (task: ScheduledTask) => Promise<void>
+export type { ScheduledTask, ScheduleInput, TaskType, TaskStatus, TaskCallback } from './task-types.js'
 
 export interface SchedulerOptions {
   checkIntervalMs?: number
+  store?: TaskStore
 }
 
 export class Scheduler {
@@ -36,9 +15,24 @@ export class Scheduler {
   private running = false
   private checkInterval?: ReturnType<typeof setInterval>
   private checkIntervalMs: number
+  private store?: TaskStore
 
   constructor(options?: SchedulerOptions) {
     this.checkIntervalMs = options?.checkIntervalMs ?? 60000
+    this.store = options?.store
+    if (this.store) {
+      for (const t of this.store.load()) {
+        this.tasks.set(t.id, t)
+        if (t.runAt && t.status === 'pending') {
+          const delay = t.runAt.getTime() - Date.now()
+          if (delay > 0) {
+            const timer = setTimeout(() => this.executeTask(t.id), delay)
+            this.timers.set(t.id, timer)
+          }
+          if (t.cron) this.startCronCheck()
+        }
+      }
+    }
   }
 
   onTaskDue(callback: TaskCallback): void {
@@ -49,6 +43,7 @@ export class Scheduler {
     const id = this.generateId()
     const task: ScheduledTask = { id, ...input, status: 'pending' }
     this.tasks.set(id, task)
+    this.store?.save(task)
 
     if (input.runAt && !input.cron) {
       const delay = input.runAt.getTime() - Date.now()
@@ -66,7 +61,9 @@ export class Scheduler {
   cancel(id: string): boolean {
     const timer = this.timers.get(id)
     if (timer) { clearTimeout(timer); this.timers.delete(id) }
-    return this.tasks.delete(id)
+    const removed = this.tasks.delete(id)
+    if (removed) this.store?.delete(id)
+    return removed
   }
 
   list(): ScheduledTask[] {

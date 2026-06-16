@@ -103,6 +103,9 @@ importers:
       '@socialkit/testing':
         specifier: workspace:*
         version: link:../testing
+      '@types/node':
+        specifier: ^22.19.21
+        version: 22.19.21
       typescript:
         specifier: ^5.7.0
         version: 5.9.3

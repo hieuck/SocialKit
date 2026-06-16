@@ -6,6 +6,7 @@ import { loginCommand } from './login.js'
 import { whoamiCommand } from './whoami.js'
 import { postCommand } from './post.js'
 import { scheduleCommand } from './schedule.js'
+import { daemonCommand } from './daemon.js'
 
 export interface CliOptions {
   session: Session
@@ -33,6 +34,8 @@ export class Cli {
           return await this.handlePost(parsed.payload, provider)
         case 'schedule':
           return await this.handleSchedule(parsed.payload, provider)
+        case 'daemon':
+          return this.handleDaemon(parsed.payload, provider)
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err)
@@ -53,6 +56,7 @@ export class Cli {
       '  socialkit schedule --page <id> --message <t> [--at <time>]',
       '  socialkit schedule list                 List scheduled tasks',
       '  socialkit schedule cancel <id>          Cancel a task',
+      '  socialkit daemon                        Run daemon for pending tasks',
     ].join('\n')
   }
 
@@ -91,5 +95,11 @@ export class Cli {
       subcommand: payload.subcommand,
       taskId: payload.taskId,
     })
+  }
+
+  private handleDaemon(payload: Record<string, string>, provider?: SocialProvider): string {
+    if (!provider) return 'Not logged in.'
+    const result = daemonCommand(provider, {})
+    return result.message
   }
 }

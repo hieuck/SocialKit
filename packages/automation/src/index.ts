@@ -1,5 +1,7 @@
 export { Scheduler } from './scheduler.js'
-export type { TaskType, TaskStatus, ScheduledTask, ScheduleInput, TaskCallback, SchedulerOptions } from './scheduler.js'
+export type { SchedulerOptions } from './scheduler.js'
+export type { TaskType, TaskStatus, ScheduledTask, ScheduleInput, TaskCallback } from './task-types.js'
 export { AutomationEngine } from './engine.js'
 export type { PostInput, CommentInput, LikeInput } from './engine.js'
 export { AutoExecutor } from './executor.js'
+export { TaskStore } from './task-store.js'
