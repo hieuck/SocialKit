@@ -3,9 +3,13 @@ import { Session, ProviderRegistry, Cli } from '@socialkit/cli'
 import { FacebookProvider } from '@socialkit/provider-facebook'
 import { InstagramProvider } from '@socialkit/provider-instagram'
 import { ZaloProvider } from '@socialkit/provider-zalo'
-import { join } from 'path'
+import { join, dirname } from 'path'
+import { fileURLToPath } from 'url'
 import { homedir } from 'os'
 import { existsSync, mkdirSync } from 'fs'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
 
 let mainWindow: BrowserWindow | null = null
 
