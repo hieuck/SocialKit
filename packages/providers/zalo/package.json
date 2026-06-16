@@ -6,13 +6,15 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "test": "echo \"No tests yet\"",
+    "test": "node --experimental-vm-modules --no-warnings ../../../node_modules/jest/bin/jest.js --verbose",
+    "test:cov": "node --experimental-vm-modules --no-warnings ../../../node_modules/jest/bin/jest.js --coverage",
     "build": "tsc"
   },
   "dependencies": {
     "@socialkit/core": "workspace:*"
   },
   "devDependencies": {
-    "typescript": "^5.7.0"
+    "typescript": "^5.7.0",
+    "nock": "^14.0.0"
   }
 }
