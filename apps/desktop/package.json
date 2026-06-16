@@ -2,17 +2,26 @@
   "name": "@socialkit/desktop",
   "version": "0.1.0",
   "private": true,
-  "main": "dist/main.js",
+  "type": "module",
+  "main": "dist/main/index.js",
   "scripts": {
-    "test": "echo \"No tests yet\"",
-    "build": "echo \"Build desktop\""
+    "test": "node --experimental-vm-modules --no-warnings ../../node_modules/jest/bin/jest.js --verbose",
+    "dev": "electron .",
+    "build": "tsc && echo \"Build desktop done\""
   },
   "dependencies": {
+    "@socialkit/core": "workspace:*",
     "@socialkit/automation": "workspace:*",
     "@socialkit/analyzer": "workspace:*",
-    "@socialkit/ui": "workspace:*"
+    "@socialkit/cli": "workspace:*"
   },
   "devDependencies": {
-    "typescript": "^5.7.0"
+    "typescript": "^5.7.0",
+    "electron": "^42.0.0",
+    "@types/node": "^22.0.0",
+    "@socialkit/testing": "workspace:*",
+    "@socialkit/provider-facebook": "workspace:*",
+    "@socialkit/provider-instagram": "workspace:*",
+    "@socialkit/provider-zalo": "workspace:*"
   }
 }
