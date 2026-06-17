@@ -21,7 +21,7 @@ describe('App', () => {
   it('switches to Post tab', () => {
     render(<App />)
     fireEvent.click(screen.getByText('Post'))
-    expect(screen.getByText(/Coming soon/)).toBeInTheDocument()
+    expect(screen.getByText(/Post to Facebook/)).toBeInTheDocument()
   })
 
   it('shows navigation buttons', () => {
