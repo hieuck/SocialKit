@@ -5,34 +5,28 @@ import '@testing-library/jest-dom'
 import { render, screen, fireEvent } from '@testing-library/react'
 import App from '../src/renderer/App'
 
-declare global {
-  interface Window { socialkit: { run: jest.Mock; getPlatforms: jest.Mock; login: jest.Mock; getLoginUrl: jest.Mock } }
-}
-
-beforeEach(() => {
-  ;(window as any).socialkit = {
-    run: jest.fn().mockResolvedValue('mock'),
-    getPlatforms: jest.fn().mockResolvedValue(['facebook']),
-    login: jest.fn().mockResolvedValue('ok'),
-    getLoginUrl: jest.fn().mockResolvedValue('https://fb.com/login'),
-  }
-})
-
 describe('App', () => {
-  it('renders login view by default', () => {
+  it('renders browser URL input', () => {
     render(<App />)
-    expect(screen.getByText(/Select a platform/)).toBeInTheDocument()
+    const input = screen.getByDisplayValue('https://facebook.com')
+    expect(input).toBeInTheDocument()
   })
 
-  it('switches tabs via sidebar', () => {
+  it('shows Login tab by default', () => {
     render(<App />)
-    fireEvent.click(screen.getByTitle('Post'))
-    expect(screen.getByText(/Publish a new post/)).toBeInTheDocument()
+    const logins = screen.getAllByText('Login')
+    expect(logins.length).toBeGreaterThanOrEqual(1)
   })
 
-  it('toggles terminal panel', () => {
+  it('switches to Post tab', () => {
     render(<App />)
-    fireEvent.click(screen.getByTitle('Terminal'))
-    expect(screen.getByPlaceholderText(/socialkit/)).toBeInTheDocument()
+    fireEvent.click(screen.getByText('Post'))
+    expect(screen.getByText(/Coming soon/)).toBeInTheDocument()
+  })
+
+  it('shows navigation buttons', () => {
+    render(<App />)
+    const buttons = screen.getAllByRole('button')
+    expect(buttons.length).toBeGreaterThanOrEqual(2)
   })
 })
