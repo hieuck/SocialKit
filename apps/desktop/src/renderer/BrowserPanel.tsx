@@ -5,18 +5,18 @@ interface Props {
   onUrlChange?: (url: string) => void
   visible: boolean
   onClose: () => void
+  onOAuthCode?: (code: string) => void
 }
 
-export default function BrowserPanel({ url, onUrlChange, visible, onClose }: Props) {
+export default function BrowserPanel({ url, onUrlChange, visible, onClose, onOAuthCode }: Props) {
   const webviewRef = useRef<any>(null)
   const [currentUrl, setCurrentUrl] = useState(url)
   const [canGoBack, setCanGoBack] = useState(false)
   const [canGoForward, setCanGoForward] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const oauthHandled = useRef(false)
 
-  useEffect(() => {
-    setCurrentUrl(url)
-  }, [url])
+  useEffect(() => { setCurrentUrl(url); oauthHandled.current = false }, [url])
 
   useEffect(() => {
     const wv = webviewRef.current
@@ -28,15 +28,21 @@ export default function BrowserPanel({ url, onUrlChange, visible, onClose }: Pro
       setIsLoading(wv.isLoading())
     }
 
-    wv.addEventListener('did-navigate', (e: any) => {
+    const onNavigate = (e: any) => {
       setCurrentUrl(e.url)
       onUrlChange?.(e.url)
       onUpdate()
-    })
-    wv.addEventListener('did-navigate-in-page', (e: any) => {
-      setCurrentUrl(e.url)
-      onUpdate()
-    })
+
+      const parsed = new URL(e.url)
+      const code = parsed.searchParams.get('code')
+      if (code && !oauthHandled.current) {
+        oauthHandled.current = true
+        onOAuthCode?.(code)
+      }
+    }
+
+    wv.addEventListener('did-navigate', onNavigate)
+    wv.addEventListener('did-navigate-in-page', onNavigate)
     wv.addEventListener('did-start-loading', () => setIsLoading(true))
     wv.addEventListener('did-stop-loading', () => setIsLoading(false))
 

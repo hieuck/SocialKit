@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 
 interface Props {
   onResult: (msg: string) => void
-  onOpenBrowser?: (url: string) => void
+  onOpenBrowser?: (url: string, platform?: string) => void
 }
 
 export default function LoginView({ onResult, onOpenBrowser }: Props) {

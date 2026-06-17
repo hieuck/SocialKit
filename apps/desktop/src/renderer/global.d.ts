@@ -5,6 +5,7 @@ interface SocialKitAPI {
   getPlatforms(): Promise<string[]>
   login(platform: string): Promise<string>
   getLoginUrl(platform: string): Promise<string>
+  exchangeCode(platform: string, code: string): Promise<string>
 }
 
 declare global {

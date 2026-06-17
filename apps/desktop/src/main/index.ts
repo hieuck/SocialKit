@@ -105,6 +105,19 @@ ipcMain.handle('oauth:getLoginUrl', async (_event, platform: string) => {
   }
 })
 
+ipcMain.handle('oauth:exchangeCode', async (_event, platform: string, code: string) => {
+  try {
+    const provider = cli['options']['registry'].get(platform)
+    if (!provider) return `Error: Unknown platform ${platform}`
+    await loginCommand(provider, { code, redirectUri: `http://localhost:3001/callback` })
+    const token = provider.getAccessToken()
+    if (token) cli['options']['session'].save(platform, token)
+    return 'Logged in successfully.'
+  } catch (err) {
+    return `Error: ${err instanceof Error ? err.message : String(err)}`
+  }
+})
+
 app.whenReady().then(() => {
   createWindow()
 

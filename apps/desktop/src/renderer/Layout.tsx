@@ -90,6 +90,7 @@ interface LayoutProps {
   onBrowserUrlChange?: (url: string) => void
   onBrowserClose?: () => void
   onClearResult?: () => void
+  onOAuthCode?: (code: string) => void
 }
 
 const tabs = [
@@ -102,7 +103,7 @@ export function Layout({
   activeTab, onTabChange, children, result,
   showBrowser, showTerminal, showOutput,
   onToggleBrowser, onToggleTerminal, onToggleOutput,
-  browserUrl, onBrowserUrlChange, onBrowserClose, onClearResult,
+  browserUrl, onBrowserUrlChange, onBrowserClose, onClearResult, onOAuthCode,
 }: LayoutProps) {
   return (
     <div style={styles.container}>
@@ -126,7 +127,7 @@ export function Layout({
       <div style={styles.mainRow}>
         <div style={styles.browserCol(showBrowser)}>
           {showBrowser && browserUrl && (
-            <BrowserPanel url={browserUrl} visible={true} onUrlChange={onBrowserUrlChange} onClose={onBrowserClose || (() => {})} />
+            <BrowserPanel url={browserUrl} visible={true} onUrlChange={onBrowserUrlChange} onClose={onBrowserClose || (() => {})} onOAuthCode={onOAuthCode} />
           )}
         </div>
 
