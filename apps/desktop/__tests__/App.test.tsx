@@ -6,27 +6,34 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import App from '../src/renderer/App'
 
 describe('App', () => {
-  it('renders browser URL input', () => {
+  it('renders browser URL input with Facebook default', () => {
     render(<App />)
     const input = screen.getByDisplayValue('https://facebook.com')
     expect(input).toBeInTheDocument()
   })
 
-  it('shows Login tab by default', () => {
+  it('shows Profile tab with login instructions', () => {
     render(<App />)
-    const logins = screen.getAllByText('Login')
-    expect(logins.length).toBeGreaterThanOrEqual(1)
+    expect(screen.getByText(/Login to Facebook/)).toBeInTheDocument()
   })
 
-  it('switches to Post tab', () => {
+  it('switches to Posts tab', () => {
     render(<App />)
-    fireEvent.click(screen.getByText('Post'))
-    expect(screen.getByText(/Post to Facebook/)).toBeInTheDocument()
+    fireEvent.click(screen.getByText('Posts'))
+    const btns = screen.getAllByText(/Refresh/)
+    expect(btns.length).toBeGreaterThanOrEqual(1)
   })
 
-  it('shows navigation buttons', () => {
+  it('switches to Pages tab', () => {
     render(<App />)
-    const buttons = screen.getAllByRole('button')
-    expect(buttons.length).toBeGreaterThanOrEqual(2)
+    fireEvent.click(screen.getByText('Pages'))
+    const btns = screen.getAllByText(/Refresh/)
+    expect(btns.length).toBeGreaterThanOrEqual(1)
+  })
+
+  it('switches to Publish tab', () => {
+    render(<App />)
+    fireEvent.click(screen.getByText('Publish'))
+    expect(screen.getByText(/Publish Post/)).toBeInTheDocument()
   })
 })

@@ -1,157 +1,175 @@
 import React, { useState, useRef } from 'react'
 
-const styles = {
-  container: { display: 'flex', height: '100vh', fontFamily: "Segoe UI, sans-serif" },
+const S = {
+  c: { display: 'flex', height: '100vh', fontFamily: "Segoe UI, sans-serif" },
   browser: { flex: 1, display: 'flex', flexDirection: 'column' as const },
-  urlBar: { display: 'flex', padding: 6, background: '#f0f0f0', alignItems: 'center', gap: 4, borderBottom: '1px solid #ddd' },
+  bar: { display: 'flex', padding: 6, background: '#f0f0f0', alignItems: 'center', gap: 4, borderBottom: '1px solid #ddd' },
   btn: (d = false) => ({ padding: '4px 10px', cursor: d ? 'not-allowed' : 'pointer', fontSize: 13, background: '#fff', border: '1px solid #ccc', borderRadius: 3, opacity: d ? 0.5 : 1 }),
-  urlInput: { flex: 1, padding: '4px 8px', fontSize: 13, border: '1px solid #ccc', borderRadius: 4, outline: 'none' },
-  panel: { width: 340, borderLeft: '1px solid #ddd', display: 'flex', flexDirection: 'column' as const, background: '#fafafa' },
-  tab: (a: boolean) => ({ flex: 1, padding: '10px 0', textAlign: 'center' as const, cursor: 'pointer', fontSize: 12, fontWeight: 600, color: a ? '#1877F2' : '#666', borderBottom: a ? '2px solid #1877F2' : '2px solid transparent', background: '#fff' }),
-  content: { flex: 1, overflow: 'auto', padding: 16 },
-  statusBar: { padding: '8px 12px', fontSize: 12, borderTop: '1px solid #ddd', background: '#fff' },
-  green: { color: '#0a0' }, red: { color: '#c00' },
+  inp: { flex: 1, padding: '4px 8px', fontSize: 13, border: '1px solid #ccc', borderRadius: 4, outline: 'none' },
+  side: { width: 380, borderLeft: '1px solid #ddd', display: 'flex', flexDirection: 'column' as const, background: '#fafafa' },
+  tab: (a: boolean) => ({ padding: '8px 16px', cursor: 'pointer', fontSize: 13, fontWeight: 600, color: a ? '#1877F2' : '#666', borderBottom: a ? '2px solid #1877F2' : '2px solid transparent', background: '#fff' }),
+  scroll: { flex: 1, overflow: 'auto', padding: 12 },
+  card: { background: '#fff', border: '1px solid #e0e0e0', borderRadius: 8, padding: 12, marginBottom: 8 },
+  status: { padding: '8px 12px', fontSize: 12, borderTop: '1px solid #ddd', background: '#fff', display: 'flex', alignItems: 'center', gap: 6 },
+  log: { padding: 12, background: '#1e1e1e', color: '#ce9178', fontFamily: 'monospace', fontSize: 11, maxHeight: 120, overflow: 'auto', whiteSpace: 'pre-wrap', borderTop: '1px solid #ddd' },
+}
+
+async function api(token: string, path: string, method = 'GET', body?: any) {
+  const opts: any = { method, headers: {} as any }
+  if (token) opts.headers['Authorization'] = 'Bearer ' + token
+  if (body) { opts.headers['Content-Type'] = 'application/json'; opts.body = JSON.stringify(body) }
+  const r = await fetch('https://graph.facebook.com/v22.0' + path, opts)
+  return r.json()
 }
 
 export default function App() {
-  const webview = useRef<any>(null)
+  const wv = useRef<any>(null)
   const [url, setUrl] = useState('https://facebook.com')
-  const [inputUrl, setInputUrl] = useState('https://facebook.com')
-  const [tab, setTab] = useState('login')
+  const [iu, setIu] = useState('https://facebook.com')
+  const [tab, setTab] = useState('profile')
   const [token, setToken] = useState('')
-  const [userId, setUserId] = useState('')
-  const [result, setResult] = useState('')
-  const [history, setHistory] = useState<string[]>([])
-  const [hIdx, setHIdx] = useState(-1)
+  const [me, setMe] = useState<any>(null)
+  const [data, setData] = useState<any>(null)
+  const [log, setLog] = useState('')
+  const [hist, setHist] = useState<string[]>([])
+  const [hi, setHi] = useState(-1)
 
-  const nav = (u: string) => {
-    setUrl(u); setHistory(h => [...h, u]); setHIdx(h => h + 1)
-  }
+  const g = (p: string, m = 'GET', b?: any) => api(token, p, m, b).then(d => { setData(d); setLog(JSON.stringify(d, null, 2)); return d })
+  const nav = (u: string) => { setUrl(u); setHist(h => [...h, u]); setHi(h => h + 1) }
 
-  const extractToken = async () => {
+  const extract = async () => {
     try {
-      const wv = webview.current
-      if (!wv) return
-
-      const fbToken = await wv.executeJavaScript(`
-        (async () => {
-          try {
-            const r = await fetch('/ajax/session', { credentials: 'include' });
-            const d = await r.json();
-            return d.accessToken || '';
-          } catch(e) {
-            try {
-              const r2 = await fetch('https://www.facebook.com/ajax/session', { credentials: 'include' });
-              const d2 = await r2.json();
-              return d2.accessToken || '';
-            } catch(e2) { return 'ERROR: ' + e2.message; }
-          }
-        })()
+      const fbToken = await wv.current.executeJavaScript(`
+        fetch('/ajax/session',{credentials:'include'}).then(r=>r.json()).then(d=>d.accessToken||'')
       `)
-
-      if (fbToken && !fbToken.startsWith('ERROR')) {
-        setToken(fbToken)
-        setResult('Token extracted! You can now post/schedule.')
-        
-        const fbId = await wv.executeJavaScript(`
-          (async () => {
-            try {
-              const r = await fetch('https://graph.facebook.com/v22.0/me?access_token=${fbToken}&fields=id,name');
-              const d = await r.json();
-              return d.id || '';
-            } catch(e) { return ''; }
-          })()
-        `)
-        if (fbId) setUserId(fbId)
-      } else {
-        setResult(fbToken || 'Not logged in. Log into Facebook first.')
-      }
-    } catch (err) {
-      setResult('Error: ' + (err instanceof Error ? err.message : String(err)))
-    }
+      if (!fbToken) { setLog('Not logged in. Log into Facebook first.'); return }
+      setToken(fbToken)
+      const profile = await api(fbToken, '/me?fields=id,name,email,picture')
+      if (profile.error) { setLog('Token invalid: ' + profile.error.message); setToken(''); return }
+      setMe(profile)
+      setLog('Logged in as ' + profile.name)
+    } catch (e: any) { setLog('Error: ' + e.message) }
   }
 
-  const callApi = async (path: string, method = 'GET', body?: any) => {
-    if (!token) { setResult('Not logged in. Extract token first.'); return }
-    try {
-      const opts: any = { method, headers: { 'Authorization': `Bearer ${token}` } }
-      if (body) { opts.headers['Content-Type'] = 'application/json'; opts.body = JSON.stringify(body) }
-      const r = await fetch(`https://graph.facebook.com/v22.0${path}`, opts)
-      const d = await r.json()
-      setResult(JSON.stringify(d, null, 2))
-    } catch (err) {
-      setResult('Error: ' + (err instanceof Error ? err.message : String(err)))
-    }
+  const loadPosts = async () => {
+    const d = await g('/me/posts?fields=id,message,created_time,likes.limit(1).summary(true),comments.limit(1).summary(true)&limit=10')
+    if (d.error) return
   }
 
-  const navigate = () => {
-    const target = inputUrl.startsWith('http') ? inputUrl : 'https://' + inputUrl
-    nav(target)
-  }
-
-  const goBack = () => { const i = Math.max(0, hIdx - 1); setInputUrl(history[i]); setUrl(history[i]); setHIdx(i) }
-  const goForward = () => { const i = Math.min(history.length - 1, hIdx + 1); setInputUrl(history[i]); setUrl(history[i]); setHIdx(i) }
+  const loadPages = async () => { const d = await g('/me/accounts'); if (d.error) return }
+  const loadComments = async (id: string) => { const d = await g('/' + id + '/comments?fields=id,message,from,created_time&limit=20'); if (d.error) return }
+  const like = async (id: string) => { const d = await g('/' + id + '/likes', 'POST'); if (d.error) return }
 
   return (
-    <div style={styles.container}>
-      <div style={styles.browser}>
-        <div style={styles.urlBar}>
-          <button style={styles.btn(hIdx <= 0)} onClick={goBack} disabled={hIdx <= 0}>◀</button>
-          <button style={styles.btn(hIdx >= history.length - 1)} onClick={goForward} disabled={hIdx >= history.length - 1}>▶</button>
-          <button style={styles.btn(false)} onClick={() => nav(inputUrl)}>⟳</button>
-          <input style={styles.urlInput} value={inputUrl} onChange={e => setInputUrl(e.target.value)} onKeyDown={e => e.key === 'Enter' && navigate()} />
+    <div style={S.c}>
+      <div style={S.browser}>
+        <div style={S.bar}>
+          <button style={S.btn(hi <= 0)} onClick={() => { const i = Math.max(0, hi - 1); setIu(hist[i]); setUrl(hist[i]); setHi(i) }} disabled={hi <= 0}>◀</button>
+          <button style={S.btn(hi >= hist.length - 1)} onClick={() => { const i = Math.min(hist.length - 1, hi + 1); setIu(hist[i]); setUrl(hist[i]); setHi(i) }} disabled={hi >= hist.length - 1}>▶</button>
+          <button style={S.btn(false)} onClick={() => nav(iu)}>⟳</button>
+          <input style={S.inp} value={iu} onChange={e => setIu(e.target.value)} onKeyDown={e => e.key === 'Enter' && nav(e.currentTarget.value.startsWith('http') ? e.currentTarget.value : 'https://' + e.currentTarget.value)} />
         </div>
-        <webview ref={webview} src={url} style={{ flex: 1 }} webpreferences="contextIsolation=0" />
+        <webview ref={wv} src={url} style={{ flex: 1 }} webpreferences="contextIsolation=0" />
       </div>
 
-      <div style={styles.panel}>
-        <div style={{ display: 'flex' }}>
-          {['login', 'post', 'schedule'].map(t => (
-            <div key={t} style={styles.tab(tab === t)} onClick={() => setTab(t)}>{t.charAt(0).toUpperCase() + t.slice(1)}</div>
+      <div style={S.side}>
+        <div style={{ display: 'flex', borderBottom: '1px solid #ddd', background: '#fff' }}>
+          {['profile', 'posts', 'pages', 'publish'].map(t => (
+            <div key={t} style={S.tab(tab === t)} onClick={() => setTab(t)}>{t.charAt(0).toUpperCase() + t.slice(1)}</div>
           ))}
         </div>
 
-        <div style={styles.content}>
-          {tab === 'login' && (
+        <div style={S.scroll}>
+          {tab === 'profile' && (
             <div>
-              <h3 style={{ margin: '0 0 8px' }}>1. Login to Facebook</h3>
-              <p style={{ color: '#666', fontSize: 13, marginBottom: 12 }}>Log into Facebook in the browser panel, then click the button below.</p>
-              <button onClick={extractToken} style={{ padding: '10px 20px', background: '#1877F2', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: 600 }}>Extract Token</button>
-              {token && (
-                <div style={{ marginTop: 12, padding: 8, background: '#e8f5e9', borderRadius: 4, fontSize: 12, wordBreak: 'break-all' }}>
-                  <div style={{ fontWeight: 600, color: '#0a0' }}>Logged in</div>
-                  <div>Token: {token.slice(0, 30)}...</div>
-                  {userId && <div>User ID: {userId}</div>}
+              {!token ? (
+                <div style={S.card}>
+                  <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 8 }}>1. Login to Facebook</div>
+                  <p style={{ color: '#666', fontSize: 13, marginBottom: 12 }}>Log into Facebook in the left panel, then click the button.</p>
+                  <button onClick={extract} style={{ padding: '10px 20px', background: '#1877F2', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: 600, width: '100%' }}>Extract Token</button>
+                </div>
+              ) : (
+                <div>
+                  <div style={S.card}>
+                    {me?.picture?.data?.url && <img src={me.picture.data.url} style={{ width: 48, height: 48, borderRadius: 24, marginBottom: 8 }} />}
+                    <div style={{ fontSize: 18, fontWeight: 600 }}>{me?.name || 'Loading...'}</div>
+                    <div style={{ color: '#666', fontSize: 13 }}>ID: {me?.id}</div>
+                    {me?.email && <div style={{ color: '#666', fontSize: 13 }}>{me.email}</div>}
+                  </div>
+                  <div style={S.card}>
+                    <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 4 }}>Quick Actions</div>
+                    <button onClick={() => g('/me?fields=id,name,email,picture,birthday,location')} style={{ ...btnS, marginRight: 4 }}>Refresh</button>
+                    <button onClick={loadPosts} style={btnS}>My Posts</button>
+                    <button onClick={loadPages} style={btnS}>My Pages</button>
+                  </div>
                 </div>
               )}
             </div>
           )}
 
-          {tab === 'post' && (
+          {tab === 'posts' && (
             <div>
-              <h3 style={{ margin: '0 0 8px' }}>2. Post to Facebook</h3>
-              <p style={{ color: '#666', fontSize: 13, marginBottom: 12 }}>Publish a post to your timeline.</p>
-              <textarea id="msg" rows={4} style={{ width: '100%', padding: 8, borderRadius: 4, border: '1px solid #ccc', marginBottom: 8, fontFamily: 'inherit' }} placeholder="What's on your mind?" />
-              <button onClick={() => {
-                const msg = (document.getElementById('msg') as HTMLTextAreaElement).value
-                callApi('/me/feed', 'POST', { message: msg })
-              }} style={{ padding: '10px 20px', background: token ? '#1877F2' : '#ccc', color: '#fff', border: 'none', borderRadius: 6, cursor: token ? 'pointer' : 'not-allowed', fontWeight: 600 }} disabled={!token}>Publish</button>
+              <button onClick={loadPosts} style={{ ...btnS, width: '100%', marginBottom: 12 }}>⟳ Refresh Posts</button>
+              {data?.data?.map((p: any) => (
+                <div key={p.id} style={S.card}>
+                  <div style={{ fontSize: 13, marginBottom: 4 }}>{p.message || '(no text)'}</div>
+                  <div style={{ color: '#999', fontSize: 11, marginBottom: 6 }}>{new Date(p.created_time).toLocaleString()}</div>
+                  <div style={{ display: 'flex', gap: 8, fontSize: 12, color: '#666' }}>
+                    <span>♥ {p.likes?.summary?.total_count || 0}</span>
+                    <span>💬 {p.comments?.summary?.total_count || 0}</span>
+                    <span style={{ cursor: 'pointer', color: '#1877F2' }} onClick={() => like(p.id)}>Like</span>
+                    <span style={{ cursor: 'pointer', color: '#1877F2' }} onClick={() => loadComments(p.id)}>Comments</span>
+                  </div>
+                </div>
+              )) || <div style={{ color: '#999', fontSize: 13 }}>Click 'Refresh Posts' to load</div>}
             </div>
           )}
 
-          {tab === 'schedule' && (
+          {tab === 'pages' && (
             <div>
-              <h3 style={{ margin: '0 0 8px' }}>Schedule</h3>
-              <p style={{ color: '#666', fontSize: 13 }}>Coming soon. Use the Post tab for now.</p>
+              <button onClick={loadPages} style={{ ...btnS, width: '100%', marginBottom: 12 }}>⟳ Refresh Pages</button>
+              {data?.data?.map((p: any) => (
+                <div key={p.id} style={S.card}>
+                  <div style={{ fontWeight: 600 }}>{p.name}</div>
+                  <div style={{ color: '#999', fontSize: 11 }}>ID: {p.id}</div>
+                  <div style={{ color: '#999', fontSize: 11 }}>Category: {p.category || 'N/A'}</div>
+                </div>
+              )) || <div style={{ color: '#999', fontSize: 13 }}>Click 'Refresh Pages' to load</div>}
+            </div>
+          )}
+
+          {tab === 'publish' && (
+            <div>
+              <div style={S.card}>
+                <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 8 }}>Publish Post</div>
+                <textarea id="msg" rows={4} style={{ width: '100%', padding: 8, borderRadius: 4, border: '1px solid #ccc', marginBottom: 8, fontFamily: 'inherit' }} placeholder="What's on your mind?" />
+                <button onClick={() => {
+                  const msg = (document.getElementById('msg') as HTMLTextAreaElement).value
+                  g('/me/feed', 'POST', { message: msg })
+                }} style={{ ...btnS, width: '100%', background: token ? '#1877F2' : '#ccc', color: '#fff' }} disabled={!token}>Publish to Timeline</button>
+              </div>
+              <div style={S.card}>
+                <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 8 }}>Publish to Page</div>
+                <input id="pid" style={{ width: '100%', padding: 8, borderRadius: 4, border: '1px solid #ccc', marginBottom: 8 }} placeholder="Page ID" />
+                <textarea id="pmsg" rows={3} style={{ width: '100%', padding: 8, borderRadius: 4, border: '1px solid #ccc', marginBottom: 8, fontFamily: 'inherit' }} placeholder="Message" />
+                <button onClick={() => {
+                  const pid = (document.getElementById('pid') as HTMLInputElement).value
+                  const msg = (document.getElementById('pmsg') as HTMLTextAreaElement).value
+                  if (pid && msg) g('/' + pid + '/feed', 'POST', { message: msg })
+                }} style={{ ...btnS, width: '100%', background: token ? '#1877F2' : '#ccc', color: '#fff' }} disabled={!token}>Publish to Page</button>
+              </div>
             </div>
           )}
         </div>
 
-        <div style={styles.statusBar}>
-          <div style={token ? styles.green : styles.red}>{token ? '✅ Logged in' : '◻ Not logged in'}</div>
+        <div style={S.status}>
+          <span style={{ color: token ? '#0a0' : '#c00' }}>{token ? '●' : '○'}</span>
+          <span>{token ? (me?.name || 'Connected') : 'Not logged in'}</span>
         </div>
-        {result && <div style={{ padding: 12, background: '#1e1e1e', color: '#ce9178', fontFamily: 'monospace', fontSize: 11, maxHeight: 150, overflow: 'auto', whiteSpace: 'pre-wrap', borderTop: '1px solid #ddd' }}>{result}</div>}
+        {log && <div style={S.log}>{log}</div>}
       </div>
     </div>
   )
 }
+
+const btnS: any = { padding: '8px 16px', border: 'none', borderRadius: 4, cursor: 'pointer', fontSize: 13, fontWeight: 600, background: '#e4e6eb', color: '#050505' }
