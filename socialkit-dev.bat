@@ -1,17 +1,25 @@
 @echo off
 cd /d "%~dp0apps\desktop"
-echo === SocialKit Desktop (Dev Mode with DevTools) ===
-echo.
-echo [1/2] Building main process...
-call npx tsc
-if %errorlevel% neq 0 (
-    echo TypeScript build failed
+echo === SocialKit Desktop (Dev Mode) ===
+
+where npx >nul 2>nul
+if errorlevel 1 (
+    echo [ERROR] Node.js not found. Install from https://nodejs.org
     pause
-    exit /b %errorlevel%
+    exit /b 1
 )
-echo OK
-echo [2/2] Starting Vite + Electron...
+
+echo [1/2] Building main process...
+npx tsc
+if errorlevel 1 (
+    echo [BUILD FAILED]
+    pause
+    exit /b 1
+)
+
+echo [2/2] Starting Vite dev server + Electron with DevTools...
 set NODE_ENV=development
 start "SocialKit Dev" cmd /c "npx concurrently --kill-others "npx vite" "npx wait-on http://localhost:5173 && npx electron .""
-echo DevTools should open in the new window.
-exit /b 0
+echo Dev mode started in new window. Close all windows to stop.
+echo.
+pause >nul
