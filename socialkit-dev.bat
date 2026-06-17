@@ -12,8 +12,8 @@ if %errorlevel% neq 0 (
 )
 echo OK
 
-echo Starting with DevTools...
+echo Starting Vite dev server + Electron...
 set NODE_ENV=development
-start "" "node_modules\.bin\electron.cmd" .
-echo DevTools should open automatically. Close Electron window to exit.
+start "" "node_modules\.bin\concurrently.cmd" --kill-others "npx vite" "npx wait-on http://localhost:5173 && npx electron ."
+echo DevTools should open automatically. Close all windows to exit.
 exit /b 0

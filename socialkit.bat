@@ -36,6 +36,7 @@ if not exist "dist\renderer\index.html" (
     exit /b 1
 )
 
+set NODE_ENV=production
 start "" "node_modules\.bin\electron.cmd" .
 echo Desktop launched. Close the Electron window to exit.
 exit /b 0
