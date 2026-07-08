@@ -8,6 +8,7 @@ import { postCommand } from './post.js'
 import { scheduleCommand } from './schedule.js'
 import { daemonCommand } from './daemon.js'
 import { configureCommand } from './configure.js'
+import { workflowCommand } from './workflow.js'
 import { Config } from './config.js'
 import { autoLoginFacebook } from './auto-login.js'
 
@@ -42,6 +43,8 @@ export class Cli {
           return this.handleDaemon(parsed.payload, provider)
         case 'configure':
           return this.handleConfigure(parsed.payload)
+        case 'workflow':
+          return await this.handleWorkflow(parsed.payload, platform)
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err)
@@ -67,6 +70,8 @@ export class Cli {
       '  socialkit daemon                        Run daemon for pending tasks',
       '  socialkit configure <platform>          Show platform config',
       '  socialkit configure <platform> <k> <v>  Set config value',
+      '  socialkit workflow run <file>           Run a workflow JSON file',
+      '  socialkit workflow run <file> --platform <platform>',
     ].join('\n')
   }
 
@@ -136,6 +141,16 @@ export class Cli {
       platform: payload.platform || undefined,
       key: payload.key || undefined,
       value: payload.value || undefined,
+    })
+  }
+
+  private async handleWorkflow(payload: Record<string, string>, platform?: string): Promise<string> {
+    if (!platform) return 'Specify a platform with --platform or log in first.'
+    const provider = this.options.registry.get(platform)
+    if (!provider) return `Unknown platform: ${platform}`
+    return workflowCommand(provider, {
+      subcommand: payload.subcommand,
+      file: payload.file,
     })
   }
 }

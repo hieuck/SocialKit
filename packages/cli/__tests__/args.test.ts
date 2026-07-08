@@ -54,4 +54,18 @@ describe('parseArgs', () => {
     const result = parseArgs(['unknown'])
     expect(result.command).toBe('help')
   })
+
+  it('parses "workflow run" command with file', () => {
+    const result = parseArgs(['workflow', 'run', './workflow.json'])
+    expect(result.command).toBe('workflow')
+    expect(result.payload.subcommand).toBe('run')
+    expect(result.payload.file).toBe('./workflow.json')
+  })
+
+  it('parses "workflow run" command with --platform', () => {
+    const result = parseArgs(['workflow', 'run', './workflow.json', '--platform', 'facebook'])
+    expect(result.command).toBe('workflow')
+    expect(result.payload.file).toBe('./workflow.json')
+    expect(result.payload.platform).toBe('facebook')
+  })
 })
