@@ -22,21 +22,30 @@ export class WorkflowEngine {
       context,
     }
 
+    const stepIndexById = new Map(definition.steps.map((s, i) => [s.id, i]))
     let currentStepIndex = 0
-    while (currentStepIndex < definition.steps.length) {
+
+    while (currentStepIndex >= 0 && currentStepIndex < definition.steps.length) {
       const step = definition.steps[currentStepIndex]
       execution.currentStepId = step.id
       try {
         const output = await this.runStep(step, context)
         context.stepOutputs[step.id] = output ?? {}
+        delete context.error
+        const nextId = step.transitions?.onSuccess
+        currentStepIndex = nextId ? (stepIndexById.get(nextId) ?? currentStepIndex + 1) : currentStepIndex + 1
       } catch (err) {
         const message = err instanceof Error ? err.message : String(err)
         context.error = message
-        execution.status = 'failed'
-        execution.error = message
-        return execution
+        const fallbackId = step.transitions?.onFailure
+        if (fallbackId && stepIndexById.has(fallbackId)) {
+          currentStepIndex = stepIndexById.get(fallbackId)!
+        } else {
+          execution.status = 'failed'
+          execution.error = message
+          return execution
+        }
       }
-      currentStepIndex++
     }
 
     execution.status = 'done'

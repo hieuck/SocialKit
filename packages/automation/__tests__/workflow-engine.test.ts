@@ -114,4 +114,40 @@ describe('WorkflowEngine', () => {
     expect(provider.calls[1].args[0]).toBe('new_post_mock')
     expect(provider.calls[1].method).toBe('replyToComment')
   })
+
+  it('jumps to onFailure step when a step throws', async () => {
+    const provider = new MockSocialProvider()
+    provider.publishPost = async () => { throw new Error('post rejected') }
+    const engine = new WorkflowEngine(provider)
+    const result = await engine.execute({
+      id: 'wf_error',
+      name: 'Error Handling',
+      steps: [
+        {
+          id: 'willFail',
+          action: 'post',
+          inputs: { pageId: 'p1', message: 'x' },
+          transitions: { onFailure: 'notify' },
+        },
+        { id: 'notify', action: 'setContext', inputs: { key: 'notified', value: true } },
+      ],
+    })
+    expect(result.status).toBe('done')
+    expect(result.context.variables.notified).toBe(true)
+  })
+
+  it('fails workflow when no onFailure transition exists', async () => {
+    const provider = new MockSocialProvider()
+    provider.publishPost = async () => { throw new Error('publish failed') }
+    const engine = new WorkflowEngine(provider)
+    const result = await engine.execute({
+      id: 'wf_fatal',
+      name: 'Fatal Error',
+      steps: [
+        { id: 'p1', action: 'post', inputs: { pageId: 'p1', message: 'Hello' } },
+      ],
+    })
+    expect(result.status).toBe('failed')
+    expect(result.error).toBe('publish failed')
+  })
 })
