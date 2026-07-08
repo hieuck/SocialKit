@@ -54,8 +54,38 @@ export class WorkflowEngine {
         })
         return result
       }
+      case 'comment': {
+        const result = await this.provider.replyToComment(String(inputs.postId), String(inputs.message ?? ''))
+        return result
+      }
+      case 'like': {
+        await this.provider.likePost(String(inputs.postId))
+        return
+      }
+      case 'wait': {
+        await new Promise(r => setTimeout(r, Number(inputs.durationMs ?? 0)))
+        return
+      }
+      case 'setContext': {
+        context.variables[String(inputs.key)] = inputs.value
+        return
+      }
+      case 'condition': {
+        const result = evaluateCondition(String(inputs.expression), context.variables)
+        return { result }
+      }
       default:
         throw new Error(`Unknown action: ${step.action}`)
     }
+  }
+}
+
+function evaluateCondition(expression: string, variables: Record<string, unknown>): boolean {
+  const keys = Object.keys(variables)
+  const values = keys.map(k => variables[k])
+  try {
+    return new Function(...keys, `return (${expression})`)(...values) as boolean
+  } catch {
+    return false
   }
 }
