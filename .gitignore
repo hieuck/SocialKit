@@ -7,3 +7,6 @@ coverage/
 # Worktrees
 .worktrees/
 worktrees/
+
+# Temporary agent files
+.kimchi/tmp/
