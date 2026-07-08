@@ -1,20 +1,10 @@
 /**
  * @jest-environment jsdom
  */
+/// <reference path="../src/types/window-mock.d.ts" />
 import '@testing-library/jest-dom'
 import { render, screen, fireEvent } from '@testing-library/react'
 import LoginView from '../src/renderer/LoginView'
-
-declare global {
-  interface Window {
-    socialkit: {
-      run: jest.Mock
-      getPlatforms: jest.Mock
-      login: jest.Mock
-      getLoginUrl: jest.Mock
-    }
-  }
-}
 
 beforeEach(() => {
   ;(window as any).socialkit = {
