@@ -16,5 +16,6 @@
       "@socialkit/testing": ["../../packages/testing/src/index.ts"],
       "@socialkit/ui": ["../../packages/ui/src/index.ts"]
     }
-  }
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx", "types/**/*.d.ts"]
 }

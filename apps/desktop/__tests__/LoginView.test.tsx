@@ -1,7 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-/// <reference path="../src/types/window-mock.d.ts" />
+/// <reference path="../types/window-mock.d.ts" />
 import '@testing-library/jest-dom'
 import { render, screen, fireEvent } from '@testing-library/react'
 import LoginView from '../src/renderer/LoginView'
