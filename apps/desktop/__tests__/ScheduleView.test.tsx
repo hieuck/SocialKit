@@ -1,13 +1,10 @@
 /**
  * @jest-environment jsdom
  */
+/// <reference path="../src/types/window-mock.d.ts" />
 import '@testing-library/jest-dom'
 import { render, screen } from '@testing-library/react'
 import ScheduleView from '../src/renderer/ScheduleView'
-
-declare global {
-  interface Window { socialkit: { run: jest.Mock; getPlatforms: jest.Mock; login: jest.Mock } }
-}
 
 beforeEach(() => {
   ;(window as any).socialkit = {
