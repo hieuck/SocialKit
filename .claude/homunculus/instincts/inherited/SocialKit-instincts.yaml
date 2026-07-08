@@ -1,0 +1,666 @@
+# Instincts generated from https://github.com/hieuck/SocialKit
+# Generated: 2026-07-08T15:25:48.318Z
+# Version: 2.0
+# NOTE: This file supplements (does not replace) any existing curated instincts.
+# High-confidence manually curated instincts should be preserved alongside these.
+
+---
+id: SocialKit-commit-conventional
+trigger: "when writing a commit message"
+confidence: 0.85
+domain: git
+source: repo-analysis
+source_repo: https://github.com/hieuck/SocialKit
+---
+
+# SocialKit Commit Conventional
+
+## Action
+
+Use conventional commit format with prefixes: feat, fix, chore, test
+
+## Evidence
+
+- 36 commits analyzed
+- Detected conventional commit pattern
+- Examples: test: fill coverage gaps in facebook + testing packages, feat(cli): Config persistence + configure command
+
+---
+id: SocialKit-commit-length
+trigger: "when writing a commit message"
+confidence: 0.6
+domain: git
+source: repo-analysis
+source_repo: https://github.com/hieuck/SocialKit
+---
+
+# SocialKit Commit Length
+
+## Action
+
+Write moderate-length commit messages (~54 characters)
+
+## Evidence
+
+- Average commit message length: 54 chars
+- Based on 36 commits
+
+---
+id: SocialKit-naming-files
+trigger: "when creating a new file"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/hieuck/SocialKit
+---
+
+# SocialKit Naming Files
+
+## Action
+
+Use camelCase naming convention
+
+## Evidence
+
+- Analyzed file naming patterns in repository
+- Dominant pattern: camelCase
+
+---
+id: SocialKit-import-relative
+trigger: "when importing modules"
+confidence: 0.75
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/hieuck/SocialKit
+---
+
+# SocialKit Import Relative
+
+## Action
+
+Use relative imports for project files
+
+## Evidence
+
+- Import analysis shows relative import pattern
+- Example: import { x } from '../lib/x'
+
+---
+id: SocialKit-export-style
+trigger: "when exporting from a module"
+confidence: 0.7
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/hieuck/SocialKit
+---
+
+# SocialKit Export Style
+
+## Action
+
+Prefer default exports
+
+## Evidence
+
+- Export pattern analysis
+- Dominant style: default
+
+---
+id: SocialKit-test-framework
+trigger: "when writing tests"
+confidence: 0.9
+domain: testing
+source: repo-analysis
+source_repo: https://github.com/hieuck/SocialKit
+---
+
+# SocialKit Test Framework
+
+## Action
+
+Use jest as the test framework
+
+## Evidence
+
+- Test framework detected: jest
+- File pattern: *.test.ts
+
+---
+id: SocialKit-test-naming
+trigger: "when creating a test file"
+confidence: 0.85
+domain: testing
+source: repo-analysis
+source_repo: https://github.com/hieuck/SocialKit
+---
+
+# SocialKit Test Naming
+
+## Action
+
+Name test files using the pattern: *.test.ts
+
+## Evidence
+
+- File pattern: *.test.ts
+- Consistent across test files
+
+---
+id: SocialKit-workflow-feature-development
+trigger: "when implementing a new feature"
+confidence: 0.9
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/hieuck/SocialKit
+---
+
+# SocialKit Workflow Feature Development
+
+## Action
+
+Follow the feature-development workflow:
+1. Add feature implementation
+2. Add tests for feature
+3. Update documentation
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~18x per month
+- Files: packages/cli/__tests__/*, packages/cli/src/*, apps/playground/__tests__/*
+
+---
+id: SocialKit-workflow-feature-implementation-with-tests
+trigger: "when doing feature implementation with tests"
+confidence: 0.8
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/hieuck/SocialKit
+---
+
+# SocialKit Workflow Feature Implementation With Tests
+
+## Action
+
+Follow the feature-implementation-with-tests workflow:
+1. Implement new feature logic in source files (e.g., src/feature.ts).
+2. Add or update corresponding test files (e.g., __tests__/feature.test.ts).
+3. Update package.json or configuration if needed.
+4. Commit with a feat: or similar message.
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~6x per month
+- Files: packages/*/src/*.ts, packages/*/__tests__/*.test.ts, apps/*/src/**/*.ts
+
+---
+id: SocialKit-workflow-add-or-extend-cli-command
+trigger: "when doing add or extend cli command"
+confidence: 0.65
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/hieuck/SocialKit
+---
+
+# SocialKit Workflow Add Or Extend Cli Command
+
+## Action
+
+Follow the add-or-extend-cli-command workflow:
+1. Implement or update CLI logic in src/cli.ts, src/args.ts, or related files.
+2. Add or update command-specific files (e.g., src/login.ts, src/configure.ts).
+3. Update or add tests in __tests__ (e.g., config.test.ts, configure.test.ts, login.test.ts).
+4. Update CLI entry point if needed (src/cli-entry.ts).
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~3x per month
+- Files: packages/cli/src/cli.ts, packages/cli/src/args.ts, packages/cli/src/cli-entry.ts
+
+---
+id: SocialKit-workflow-add-or-update-desktop-ui-panel
+trigger: "when doing add or update desktop ui panel"
+confidence: 0.7
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/hieuck/SocialKit
+---
+
+# SocialKit Workflow Add Or Update Desktop Ui Panel
+
+## Action
+
+Follow the add-or-update-desktop-ui-panel workflow:
+1. Implement new or updated React component in src/renderer (e.g., TerminalPanel.tsx, OutputPanel.tsx, BrowserPanel.tsx).
+2. Update App.tsx and/or Layout.tsx to include the new panel or view.
+3. Add or update corresponding test files in __tests__.
+4. Update global.d.ts or preload/index.ts if new IPC or APIs are exposed.
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~4x per month
+- Files: apps/desktop/src/renderer/*.tsx, apps/desktop/src/renderer/App.tsx, apps/desktop/src/renderer/Layout.tsx
+
+---
+id: SocialKit-workflow-add-or-extend-automation-workflow-engine
+trigger: "when doing add or extend automation workflow engine"
+confidence: 0.65
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/hieuck/SocialKit
+---
+
+# SocialKit Workflow Add Or Extend Automation Workflow Engine
+
+## Action
+
+Follow the add-or-extend-automation-workflow-engine workflow:
+1. Implement or update types in src/task-types.ts or src/workflow-types.ts.
+2. Add or update logic in src/workflow-engine.ts or src/workflow-scheduler.ts.
+3. Add or update corresponding test files in __tests__.
+4. Export new APIs in src/index.ts if needed.
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~3x per month
+- Files: packages/automation/src/task-types.ts, packages/automation/src/workflow-types.ts, packages/automation/src/workflow-engine.ts
+
+---
+id: SocialKit-workflow-batch-script-update-for-desktop-launch
+trigger: "when doing batch script update for desktop launch"
+confidence: 0.7
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/hieuck/SocialKit
+---
+
+# SocialKit Workflow Batch Script Update For Desktop Launch
+
+## Action
+
+Follow the batch-script-update-for-desktop-launch workflow:
+1. Add or update .bat or .ps1 files at the project root.
+2. Adjust build, environment, or launch commands as needed.
+3. Test script changes for Windows compatibility.
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~4x per month
+- Files: socialkit.bat, socialkit-dev.bat, socialkit.ps1
+
+---
+id: socialkit-instinct-file-naming-camelCase
+trigger: "When creating a new file (TypeScript source or test)"
+confidence: 0.85
+domain: code-style
+source: repo-analysis
+source_repo: hieuck/SocialKit
+---
+
+# Socialkit Instinct File Naming CamelCase
+
+## Action
+
+Name the file using camelCase (e.g., myFeature.ts, config.test.ts)
+
+## Evidence
+
+- Pattern in namingConventions.files: camelCase
+- Seen in files: packages/cli/src/args.ts, packages/cli/__tests__/config.test.ts
+
+---
+id: socialkit-instinct-function-naming-camelCase
+trigger: "When defining a new function"
+confidence: 0.85
+domain: code-style
+source: repo-analysis
+source_repo: hieuck/SocialKit
+---
+
+# Socialkit Instinct Function Naming CamelCase
+
+## Action
+
+Name the function using camelCase (e.g., parseArgs, handleLogin)
+
+## Evidence
+
+- Pattern in namingConventions.functions: camelCase
+
+---
+id: socialkit-instinct-class-naming-PascalCase
+trigger: "When defining a new class"
+confidence: 0.85
+domain: code-style
+source: repo-analysis
+source_repo: hieuck/SocialKit
+---
+
+# Socialkit Instinct Class Naming PascalCase
+
+## Action
+
+Name the class using PascalCase (e.g., MockProvider, WorkflowEngine)
+
+## Evidence
+
+- Pattern in namingConventions.classes: PascalCase
+
+---
+id: socialkit-instinct-constant-naming-SCREAMING_SNAKE_CASE
+trigger: "When declaring a constant"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: hieuck/SocialKit
+---
+
+# Socialkit Instinct Constant Naming SCREAMING_SNAKE_CASE
+
+## Action
+
+Name the constant using SCREAMING_SNAKE_CASE (e.g., DEFAULT_TIMEOUT)
+
+## Evidence
+
+- Pattern in namingConventions.constants: SCREAMING_SNAKE_CASE
+
+---
+id: socialkit-instinct-import-style-relative
+trigger: "When importing modules within the same package/app"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: hieuck/SocialKit
+---
+
+# Socialkit Instinct Import Style Relative
+
+## Action
+
+Use relative import paths (e.g., import { foo } from './foo')
+
+## Evidence
+
+- Pattern in importStyle: relative
+
+---
+id: socialkit-instinct-export-style-default
+trigger: "When exporting modules or components"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: hieuck/SocialKit
+---
+
+# Socialkit Instinct Export Style Default
+
+## Action
+
+Use default exports (e.g., export default MyComponent)
+
+## Evidence
+
+- Pattern in exportStyle: default
+
+---
+id: socialkit-instinct-test-file-pattern
+trigger: "When creating a test file"
+confidence: 0.9
+domain: testing
+source: repo-analysis
+source_repo: hieuck/SocialKit
+---
+
+# Socialkit Instinct Test File Pattern
+
+## Action
+
+Name the test file with the pattern *.test.ts or *.test.tsx
+
+## Evidence
+
+- Pattern in testing.filePattern: *.test.ts
+- Seen in files: packages/cli/__tests__/config.test.ts, apps/desktop/__tests__/outputPanel.test.tsx
+
+---
+id: socialkit-instinct-test-location-mixed
+trigger: "When adding tests to a package or app"
+confidence: 0.8
+domain: testing
+source: repo-analysis
+source_repo: hieuck/SocialKit
+---
+
+# Socialkit Instinct Test Location Mixed
+
+## Action
+
+Place test files in __tests__ folders adjacent to source files or in mixed locations as per existing structure
+
+## Evidence
+
+- Pattern in architecture.folderStructure.testLocation: mixed
+- Seen in files: packages/cli/__tests__/, apps/desktop/__tests__/
+
+---
+id: socialkit-instinct-testing-framework-jest
+trigger: "When writing new tests"
+confidence: 0.9
+domain: testing
+source: repo-analysis
+source_repo: hieuck/SocialKit
+---
+
+# Socialkit Instinct Testing Framework Jest
+
+## Action
+
+Use Jest as the testing framework
+
+## Evidence
+
+- Pattern in testing.framework: jest
+
+---
+id: socialkit-instinct-test-type-unit
+trigger: "When writing tests for new features or modules"
+confidence: 0.85
+domain: testing
+source: repo-analysis
+source_repo: hieuck/SocialKit
+---
+
+# Socialkit Instinct Test Type Unit
+
+## Action
+
+Write unit tests for the new logic
+
+## Evidence
+
+- Pattern in testing.testTypes: unit
+
+---
+id: socialkit-instinct-commit-conventional-format
+trigger: "When making a git commit"
+confidence: 0.95
+domain: git
+source: repo-analysis
+source_repo: hieuck/SocialKit
+---
+
+# Socialkit Instinct Commit Conventional Format
+
+## Action
+
+Format the commit message as <type>(<scope>): <description> (e.g., feat(cli): add login command)
+
+## Evidence
+
+- Pattern in commits.type: conventional
+- Seen in commit: feat(cli): login --token for direct token auth (no OAuth)
+
+---
+id: socialkit-instinct-commit-type-prefixes
+trigger: "When choosing a commit type"
+confidence: 0.9
+domain: git
+source: repo-analysis
+source_repo: hieuck/SocialKit
+---
+
+# Socialkit Instinct Commit Type Prefixes
+
+## Action
+
+Use one of the prefixes: feat, fix, chore, test, refactor
+
+## Evidence
+
+- Pattern in commits.prefixes: [feat, fix, chore, test]
+- Seen in commit: fix(desktop): register providers in Electron + wait-on dev script
+
+---
+id: socialkit-instinct-commit-length-average
+trigger: "When writing a commit message"
+confidence: 0.7
+domain: git
+source: repo-analysis
+source_repo: hieuck/SocialKit
+---
+
+# Socialkit Instinct Commit Length Average
+
+## Action
+
+Keep the commit message concise, around 54 characters on average
+
+## Evidence
+
+- Pattern in commits.averageLength: 54
+
+---
+id: socialkit-instinct-feature-implementation-with-tests
+trigger: "When adding a new feature or significant capability to a package or app"
+confidence: 0.95
+domain: workflow
+source: repo-analysis
+source_repo: hieuck/SocialKit
+---
+
+# Socialkit Instinct Feature Implementation With Tests
+
+## Action
+
+Implement feature logic in src/, add/update tests in __tests__/, update package.json/config if needed, and commit with a feat: message
+
+## Evidence
+
+- Workflow: feature-implementation-with-tests
+- Seen in commits: feat(cli): Config persistence + configure command
+
+---
+id: socialkit-instinct-add-or-extend-cli-command
+trigger: "When adding or modifying a CLI command or flag"
+confidence: 0.9
+domain: workflow
+source: repo-analysis
+source_repo: hieuck/SocialKit
+---
+
+# Socialkit Instinct Add Or Extend Cli Command
+
+## Action
+
+Update CLI logic in src/cli.ts, src/args.ts, add/update command files and tests, update CLI entry point if needed
+
+## Evidence
+
+- Workflow: add-or-extend-cli-command
+- Seen in files: packages/cli/src/cli.ts, packages/cli/__tests__/login.test.ts
+
+---
+id: socialkit-instinct-add-or-update-desktop-ui-panel
+trigger: "When adding a new UI panel or updating the desktop app layout"
+confidence: 0.93
+domain: workflow
+source: repo-analysis
+source_repo: hieuck/SocialKit
+---
+
+# Socialkit Instinct Add Or Update Desktop Ui Panel
+
+## Action
+
+Implement or update React component in src/renderer, update App.tsx/Layout.tsx, add/update tests, update global.d.ts or preload/index.ts if needed
+
+## Evidence
+
+- Workflow: add-or-update-desktop-ui-panel
+- Seen in files: apps/desktop/src/renderer/TerminalPanel.tsx, apps/desktop/__tests__/outputPanel.test.tsx
+
+---
+id: socialkit-instinct-add-or-extend-automation-workflow-engine
+trigger: "When adding new automation actions, transitions, or workflow types"
+confidence: 0.9
+domain: workflow
+source: repo-analysis
+source_repo: hieuck/SocialKit
+---
+
+# Socialkit Instinct Add Or Extend Automation Workflow Engine
+
+## Action
+
+Update types in task-types.ts/workflow-types.ts, update workflow-engine.ts/workflow-scheduler.ts, add/update tests, export new APIs in index.ts if needed
+
+## Evidence
+
+- Workflow: add-or-extend-automation-workflow-engine
+- Seen in files: packages/automation/src/task-types.ts, packages/automation/__tests__/workflowEngine.test.ts
+
+---
+id: socialkit-instinct-batch-script-update-for-desktop-launch
+trigger: "When improving, fixing, or adding scripts for launching the desktop app"
+confidence: 0.88
+domain: workflow
+source: repo-analysis
+source_repo: hieuck/SocialKit
+---
+
+# Socialkit Instinct Batch Script Update For Desktop Launch
+
+## Action
+
+Add or update .bat/.ps1 files at project root, adjust launch/build commands, test for Windows compatibility
+
+## Evidence
+
+- Workflow: batch-script-update-for-desktop-launch
+- Seen in files: socialkit.bat, socialkit-dev.bat
+
+---
+id: socialkit-instinct-error-handling-try-catch
+trigger: "When handling errors in TypeScript code"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: hieuck/SocialKit
+---
+
+# Socialkit Instinct Error Handling Try Catch
+
+## Action
+
+Use try-catch blocks for error handling
+
+## Evidence
+
+- Pattern in errorHandling.style: try-catch
+
