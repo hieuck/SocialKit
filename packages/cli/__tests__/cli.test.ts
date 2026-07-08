@@ -2,7 +2,7 @@ import { Cli } from '../src/cli'
 import { Session } from '../src/session'
 import { ProviderRegistry } from '../src/registry'
 import { MockSocialProvider } from '@socialkit/testing'
-import { mkdtempSync, existsSync, unlinkSync } from 'fs'
+import { mkdtempSync } from 'fs'
 import { join } from 'path'
 import { tmpdir } from 'os'
 

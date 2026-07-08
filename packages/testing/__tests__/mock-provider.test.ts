@@ -1,5 +1,5 @@
 import { MockSocialProvider } from '../src'
-import { SocialProfile, SocialPage, SocialPost, SocialComment } from '@socialkit/core'
+import { SocialProfile, SocialPage } from '@socialkit/core'
 
 describe('MockSocialProvider', () => {
   let provider: MockSocialProvider

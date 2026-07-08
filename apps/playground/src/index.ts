@@ -1,6 +1,5 @@
 import { execSync } from 'child_process'
 import { join } from 'path'
-import { fileURLToPath } from 'url'
 
 const cli = join(process.cwd(), '../../packages/cli/dist/cli-entry.js')
 

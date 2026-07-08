@@ -1,4 +1,3 @@
-import { SocialProvider } from '@socialkit/core'
 import { Session, ProviderRegistry, Cli } from '@socialkit/cli'
 
 export interface DesktopBridgeOptions {

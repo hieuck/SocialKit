@@ -37,7 +37,7 @@ export function daemonCommand(provider: SocialProvider, input: DaemonInput): Dae
 
     for (const task of loaded) {
       if (task.cron) {
-        engine.schedulePost({ pageId: task.pageId, message: (task.payload as any)?.message ?? '', cron: task.cron })
+        engine.schedulePost({ pageId: task.pageId, message: (task.payload as { message?: string })?.message ?? '', cron: task.cron })
       }
     }
 

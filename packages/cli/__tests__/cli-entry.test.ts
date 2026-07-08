@@ -1,7 +1,4 @@
 import { getSessionPath } from '../src/cli-entry'
-import { existsSync, mkdtempSync } from 'fs'
-import { join } from 'path'
-import { tmpdir } from 'os'
 
 describe('cli-entry', () => {
   describe('getSessionPath', () => {

@@ -1,5 +1,5 @@
 import { Config } from '../src/config'
-import { mkdtempSync, existsSync, unlinkSync, readFileSync } from 'fs'
+import { mkdtempSync, existsSync, unlinkSync } from 'fs'
 import { join } from 'path'
 import { tmpdir } from 'os'
 

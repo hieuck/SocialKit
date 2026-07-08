@@ -1,8 +1,6 @@
 import { InstagramProvider } from '../src'
 import nock from 'nock'
 
-const BASE = 'https://graph.facebook.com/v22.0'
-
 describe('InstagramProvider', () => {
   let provider: InstagramProvider
   const config = { appId: 'app123', appSecret: 'secret456', igUserId: 'ig_user_1' }

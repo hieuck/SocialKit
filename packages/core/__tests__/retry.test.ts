@@ -27,10 +27,10 @@ describe('withRetry', () => {
   it('uses exponential backoff', async () => {
     const delays: number[] = []
     const original = setTimeout
-    jest.spyOn(globalThis, 'setTimeout').mockImplementation(((fn: any, ms: number) => {
-      delays.push(ms)
-      return original(fn, 0) as any
-    }) as any)
+    jest.spyOn(globalThis, 'setTimeout').mockImplementation(((fn: TimerHandler, ms?: number) => {
+      if (typeof ms === 'number') delays.push(ms)
+      return original(fn, 0) as unknown as number
+    }) as unknown as typeof setTimeout)
 
     let attempts = 0
     const fn = withRetry(async () => {

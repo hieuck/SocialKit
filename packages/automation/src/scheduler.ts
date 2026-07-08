@@ -1,5 +1,5 @@
 import { TaskStore } from './task-store.js'
-import type { ScheduledTask, ScheduleInput, TaskType, TaskStatus, TaskCallback } from './task-types.js'
+import type { ScheduledTask, ScheduleInput, TaskCallback } from './task-types.js'
 
 export type { ScheduledTask, ScheduleInput, TaskType, TaskStatus, TaskCallback } from './task-types.js'
 

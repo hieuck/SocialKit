@@ -1,4 +1,4 @@
-import { Scheduler, ScheduledTask } from '../src/scheduler'
+import { Scheduler } from '../src/scheduler'
 
 describe('Scheduler', () => {
   let scheduler: Scheduler
@@ -60,7 +60,7 @@ describe('Scheduler', () => {
 
   it('marks executed task as done', async () => {
     scheduler.onTaskDue(async () => {})
-    const task = scheduler.schedule({ type: 'post', pageId: 'p1', payload: { message: 'X' }, runAt: new Date(Date.now() + 50) })
+    scheduler.schedule({ type: 'post', pageId: 'p1', payload: { message: 'X' }, runAt: new Date(Date.now() + 50) })
     await new Promise(r => setTimeout(r, 150))
     const updated = scheduler.list()
     expect(updated[0].status).toBe('done')
@@ -68,7 +68,7 @@ describe('Scheduler', () => {
 
   it('marks task as failed when callback throws', async () => {
     scheduler.onTaskDue(async () => { throw new Error('oops') })
-    const task = scheduler.schedule({ type: 'post', pageId: 'p1', payload: { message: 'X' }, runAt: new Date(Date.now() + 50) })
+    scheduler.schedule({ type: 'post', pageId: 'p1', payload: { message: 'X' }, runAt: new Date(Date.now() + 50) })
     await new Promise(r => setTimeout(r, 150))
     const updated = scheduler.list()
     expect(updated[0].status).toBe('failed')

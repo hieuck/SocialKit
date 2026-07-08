@@ -10,3 +10,4 @@ worktrees/
 
 # Temporary agent files
 .kimchi/tmp/
+.kimchi/debug/

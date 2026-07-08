@@ -1,8 +1,5 @@
 import { FacebookProvider } from '../src'
 import nock from 'nock'
-import { SocialTokenResponse } from '@socialkit/core'
-
-const BASE = 'https://graph.facebook.com/v22.0'
 
 describe('FacebookProvider', () => {
   let provider: FacebookProvider

@@ -1,8 +1,6 @@
 import { ZaloProvider } from '../src'
 import nock from 'nock'
 
-const BASE = 'https://openapi.zalo.me/v2.0'
-
 describe('ZaloProvider', () => {
   let provider: ZaloProvider
   const config = { appId: 'app123', appSecret: 'secret456' }

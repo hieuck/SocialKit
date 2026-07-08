@@ -9,10 +9,44 @@ export interface AutoLoginResult {
   userId?: string
 }
 
+interface PlaywrightResponse {
+  url: () => string
+}
+
+interface PlaywrightPage {
+  evaluate: <T>(fn: () => T) => Promise<T>
+  goto: (url: string, options?: { waitUntil?: string }) => Promise<void>
+  fill: (selector: string, value: string) => Promise<void>
+  click: (selector: string) => Promise<void>
+  waitForTimeout: (ms: number) => Promise<void>
+  on: (event: string, handler: (response: PlaywrightResponse) => void) => void
+}
+
+interface PlaywrightContext {
+  newPage: () => Promise<PlaywrightPage>
+}
+
+interface PlaywrightBrowser {
+  newContext: () => Promise<PlaywrightContext>
+  close: () => Promise<void>
+}
+
+interface PlaywrightModule {
+  chromium: {
+    launch: (options?: { headless?: boolean }) => Promise<PlaywrightBrowser>
+  }
+}
+
+declare global {
+  interface Window {
+    __accessToken?: string
+  }
+}
+
 export async function autoLoginFacebook(options: AutoLoginOptions = {}): Promise<AutoLoginResult> {
-  let playwright: any
+  let playwright: PlaywrightModule
   try {
-    playwright = await import('playwright')
+    playwright = await import('playwright') as unknown as PlaywrightModule
   } catch {
     throw new Error('playwright not installed. Run: npx playwright install chromium')
   }
@@ -22,11 +56,11 @@ export async function autoLoginFacebook(options: AutoLoginOptions = {}): Promise
   })
 
   const context = await browser.newContext()
-  const page = await context.newPage()
+  const page = await context.newPage() as PlaywrightPage
 
   let capturedToken: string | null = null
 
-  page.on('response', async (response: any) => {
+  page.on('response', async (response: PlaywrightResponse) => {
     const url = response.url()
     if (url.includes('graph.facebook.com') && url.includes('access_token=')) {
       const match = url.match(/access_token=([^&]+)/)
@@ -47,7 +81,7 @@ export async function autoLoginFacebook(options: AutoLoginOptions = {}): Promise
   await page.waitForTimeout(2000)
 
   const tokenFromPage = await page.evaluate(() => {
-    return (window as any).__accessToken || null
+    return window.__accessToken || null
   }).catch(() => null)
 
   await browser.close()
