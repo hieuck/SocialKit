@@ -2,7 +2,7 @@ import { Cli } from '../src/cli'
 import { Session } from '../src/session'
 import { ProviderRegistry } from '../src/registry'
 import { MockSocialProvider } from '@socialkit/testing'
-import { mkdtempSync } from 'fs'
+import { mkdtempSync, writeFileSync, rmSync } from 'fs'
 import { join } from 'path'
 import { tmpdir } from 'os'
 
@@ -94,5 +94,48 @@ describe('Cli', () => {
     const cli = new Cli({ session, registry })
     const result = await cli.run(['whoami'])
     expect(result).toBe('Error: raw string error')
+  })
+
+  it('runs a workflow from a file', async () => {
+    const dir = mkdtempSync(join(tmpdir(), 'cli-workflow-test-'))
+    const file = join(dir, 'workflow.json')
+    writeFileSync(file, JSON.stringify({
+      id: 'announce',
+      name: 'Announce',
+      steps: [{ id: 'post1', action: 'post', inputs: { pageId: 'p1', message: 'Hello' } }],
+    }))
+
+    const registry = new ProviderRegistry()
+    registry.register('facebook', () => new MockSocialProvider())
+    const session = testSession()
+    session.save('facebook', 'tok')
+
+    const cli = new Cli({ session, registry })
+    const result = await cli.run(['workflow', 'run', file])
+    expect(result).toContain('Workflow announce completed')
+
+    rmSync(dir, { recursive: true, force: true })
+  })
+
+  it('runs a workflow with explicit --platform', async () => {
+    const dir = mkdtempSync(join(tmpdir(), 'cli-workflow-test-'))
+    const file = join(dir, 'workflow.json')
+    writeFileSync(file, JSON.stringify({
+      id: 'cross',
+      name: 'Cross',
+      steps: [{ id: 'post1', action: 'post', inputs: { pageId: 'p1', message: 'Hi' } }],
+    }))
+
+    const registry = new ProviderRegistry()
+    registry.register('facebook', () => new MockSocialProvider())
+    registry.register('instagram', () => new MockSocialProvider())
+    const session = testSession()
+    session.save('instagram', 'tok')
+
+    const cli = new Cli({ session, registry })
+    const result = await cli.run(['workflow', 'run', file, '--platform', 'facebook'])
+    expect(result).toContain('Workflow cross completed')
+
+    rmSync(dir, { recursive: true, force: true })
   })
 })
