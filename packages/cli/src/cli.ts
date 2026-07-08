@@ -7,10 +7,14 @@ import { whoamiCommand } from './whoami.js'
 import { postCommand } from './post.js'
 import { scheduleCommand } from './schedule.js'
 import { daemonCommand } from './daemon.js'
+import { configureCommand } from './configure.js'
+import { Config } from './config.js'
+import { autoLoginFacebook } from './auto-login.js'
 
 export interface CliOptions {
   session: Session
   registry: ProviderRegistry
+  config?: Config
 }
 
 export class Cli {
@@ -36,6 +40,8 @@ export class Cli {
           return await this.handleSchedule(parsed.payload, provider)
         case 'daemon':
           return this.handleDaemon(parsed.payload, provider)
+        case 'configure':
+          return this.handleConfigure(parsed.payload)
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err)
@@ -49,7 +55,9 @@ export class Cli {
       '',
       'Usage:',
       '  socialkit login <platform>              Show login URL',
+      '  socialkit login <platform> --auto       Auto-login via browser (Playwright)',
       '  socialkit login <platform> --code <c>   Exchange code for token',
+      '  socialkit login <platform> --token <t>  Store token directly (no OAuth)',
       '  socialkit whoami                        Show current profile',
       '  socialkit post --page <id> --message <t> Publish a post',
       '  socialkit post --page <id> --message <t> --link <url>',
@@ -57,6 +65,8 @@ export class Cli {
       '  socialkit schedule list                 List scheduled tasks',
       '  socialkit schedule cancel <id>          Cancel a task',
       '  socialkit daemon                        Run daemon for pending tasks',
+      '  socialkit configure <platform>          Show platform config',
+      '  socialkit configure <platform> <k> <v>  Set config value',
     ].join('\n')
   }
 
@@ -64,6 +74,23 @@ export class Cli {
     if (!platform) return 'Specify a platform: socialkit login facebook'
     const provider = this.options.registry.get(platform)
     if (!provider) return `Unknown platform: ${platform}`
+
+    if (payload.auto !== undefined) {
+      const result = await autoLoginFacebook({
+        email: process.env.SOCIALKIT_EMAIL,
+        password: process.env.SOCIALKIT_PASSWORD,
+      })
+      provider.setAccessToken(result.accessToken)
+      this.options.session.save(platform, result.accessToken)
+      return `Logged in via browser. Token: ${result.accessToken.slice(0, 20)}...`
+    }
+
+    if (payload.token) {
+      await loginCommand(provider, { token: payload.token })
+      const tok = provider.getAccessToken()
+      if (tok) this.options.session.save(platform, tok)
+      return 'Token stored.'
+    }
 
     if (payload.code) {
       await loginCommand(provider, { code: payload.code, redirectUri: payload.redirectUri || 'http://localhost:3000/callback' })
@@ -101,5 +128,14 @@ export class Cli {
     if (!provider) return 'Not logged in.'
     const result = daemonCommand(provider, {})
     return result.message
+  }
+
+  private handleConfigure(payload: Record<string, string>): string {
+    if (!this.options.config) return 'Config not available.'
+    return configureCommand(this.options.config, {
+      platform: payload.platform || undefined,
+      key: payload.key || undefined,
+      value: payload.value || undefined,
+    })
   }
 }

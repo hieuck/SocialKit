@@ -3,3 +3,10 @@ dist/
 coverage/
 .env
 *.log
+
+# Worktrees
+.worktrees/
+worktrees/
+
+# Temporary agent files
+.kimchi/tmp/

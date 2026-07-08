@@ -1,4 +1,4 @@
-export type TaskType = 'post' | 'comment' | 'like'
+export type TaskType = 'post' | 'comment' | 'like' | 'workflow'
 
 export type TaskStatus = 'pending' | 'done' | 'failed'
 

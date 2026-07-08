@@ -5,37 +5,35 @@ import '@testing-library/jest-dom'
 import { render, screen, fireEvent } from '@testing-library/react'
 import App from '../src/renderer/App'
 
-declare global {
-  interface Window { socialkit: { run: jest.Mock; getPlatforms: jest.Mock } }
-}
-
-beforeEach(() => {
-  ;(window as any).socialkit = {
-    run: jest.fn().mockResolvedValue('mock result'),
-    getPlatforms: jest.fn().mockResolvedValue(['facebook', 'instagram', 'zalo']),
-  }
-})
-
 describe('App', () => {
-  it('renders the app title', () => {
+  it('renders browser URL input with Facebook default', () => {
     render(<App />)
-    expect(screen.getByText('SocialKit')).toBeInTheDocument()
+    const input = screen.getByDisplayValue('https://facebook.com')
+    expect(input).toBeInTheDocument()
   })
 
-  it('shows login platform selector by default', () => {
+  it('shows Profile tab with login instructions', () => {
     render(<App />)
-    expect(screen.getByLabelText(/Platform/)).toBeInTheDocument()
+    expect(screen.getByText(/Login to Facebook/)).toBeInTheDocument()
   })
 
-  it('switches to post view on tab click', () => {
+  it('switches to Posts tab', () => {
     render(<App />)
-    fireEvent.click(screen.getByText('post'))
-    expect(screen.getByLabelText(/Message/)).toBeInTheDocument()
+    fireEvent.click(screen.getByText('Posts'))
+    const btns = screen.getAllByText(/Refresh/)
+    expect(btns.length).toBeGreaterThanOrEqual(1)
   })
 
-  it('switches to schedule view on tab click', () => {
+  it('switches to Pages tab', () => {
     render(<App />)
-    fireEvent.click(screen.getByText('schedule'))
-    expect(screen.getByLabelText(/Time/)).toBeInTheDocument()
+    fireEvent.click(screen.getByText('Pages'))
+    const btns = screen.getAllByText(/Refresh/)
+    expect(btns.length).toBeGreaterThanOrEqual(1)
+  })
+
+  it('switches to Publish tab', () => {
+    render(<App />)
+    fireEvent.click(screen.getByText('Publish'))
+    expect(screen.getByText(/Publish Post/)).toBeInTheDocument()
   })
 })
