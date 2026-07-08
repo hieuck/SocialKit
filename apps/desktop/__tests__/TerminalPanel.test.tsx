@@ -6,7 +6,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import TerminalPanel from '../src/renderer/TerminalPanel'
 
 declare global {
-  interface Window { socialkit: { run: jest.Mock } }
+  interface Window { socialkit: { run: jest.Mock; getPlatforms: jest.Mock; login: jest.Mock } }
 }
 
 beforeEach(() => {
