@@ -21,17 +21,21 @@ describe('TerminalPanel', () => {
 
   it('shows command in history after submit', async () => {
     render(<TerminalPanel />)
-    const input = screen.getByPlaceholderText(/socialkit/)
+    const input = screen.getByPlaceholderText(/socialkit/) as HTMLInputElement
     fireEvent.change(input, { target: { value: 'whoami' } })
     fireEvent.keyDown(input, { key: 'Enter' })
-    await waitFor(() => expect(screen.getByText('> whoami')).toBeInTheDocument())
+    await waitFor(() => {
+      expect(screen.getByText('> whoami')).toBeInTheDocument()
+      expect(input.value).toBe('')
+    })
   })
 
-  it('calls socialkit.run with parsed args', () => {
+  it('calls socialkit.run with parsed args', async () => {
     render(<TerminalPanel />)
-    const input = screen.getByPlaceholderText(/socialkit/)
+    const input = screen.getByPlaceholderText(/socialkit/) as HTMLInputElement
     fireEvent.change(input, { target: { value: 'post --page me --message hello' } })
     fireEvent.keyDown(input, { key: 'Enter' })
+    await waitFor(() => expect(input.value).toBe(''))
     expect((window as any).socialkit.run).toHaveBeenCalledWith(['post', '--page', 'me', '--message', 'hello'])
   })
 })
