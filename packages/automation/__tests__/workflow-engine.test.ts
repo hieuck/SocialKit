@@ -98,4 +98,20 @@ describe('WorkflowEngine', () => {
     })
     expect(result.context.stepOutputs.c1.result).toBe(false)
   })
+
+  it('shares post id between steps', async () => {
+    const provider = new MockSocialProvider()
+    const engine = new WorkflowEngine(provider)
+    const result = await engine.execute({
+      id: 'wf_chain',
+      name: 'Post then Comment',
+      steps: [
+        { id: 'publish', action: 'post', inputs: { pageId: 'p1', message: 'Hello' } },
+        { id: 'comment', action: 'comment', inputs: { postId: '{{steps.publish.id}}', message: 'Thanks!' } },
+      ],
+    })
+    expect(result.status).toBe('done')
+    expect(provider.calls[1].args[0]).toBe('new_post_mock')
+    expect(provider.calls[1].method).toBe('replyToComment')
+  })
 })
