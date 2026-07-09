@@ -1,4 +1,4 @@
-import { Scheduler, type ScheduledTask } from './scheduler.js'
+import { Scheduler, type ScheduledTask, type SchedulerOptions } from './scheduler.js'
 import { WorkflowEngine } from './workflow-engine.js'
 import type { WorkflowDefinition } from './workflow-types.js'
 
@@ -9,9 +9,10 @@ export interface WorkflowScheduleInput {
 }
 
 export class WorkflowScheduler {
-  private scheduler = new Scheduler()
+  private scheduler: Scheduler
 
-  constructor(private engine: WorkflowEngine) {
+  constructor(private engine: WorkflowEngine, options?: SchedulerOptions) {
+    this.scheduler = new Scheduler(options)
     this.scheduler.onTaskDue(async (task) => {
       const definition = task.payload?.definition as WorkflowDefinition
       const initialContext = (task.payload?.initialContext as Record<string, unknown>) ?? {}

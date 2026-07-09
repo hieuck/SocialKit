@@ -1,5 +1,5 @@
 import { SocialProvider } from '@socialkit/core'
-import { WorkflowEngine, WorkflowDefinition } from '@socialkit/automation'
+import { WorkflowEngine, WorkflowScheduler, WorkflowDefinition, TaskStore } from '@socialkit/automation'
 import { readFileSync } from 'fs'
 
 export interface WorkflowInput {
@@ -54,6 +54,98 @@ function validateWorkflow(definition: unknown): string | undefined {
     if (typeof (step as Record<string, unknown>).action !== 'string') return 'each step must have an action'
   }
   return undefined
+}
+
+export interface WorkflowScheduleInput {
+  subcommand: string
+  file?: string
+  at?: string
+  cron?: string
+  list?: string
+  cancel?: string
+}
+
+export async function scheduleWorkflowCommand(provider: SocialProvider, input: WorkflowScheduleInput, store?: TaskStore): Promise<string> {
+  if (input.list === 'true') {
+    const engine = new WorkflowEngine(provider)
+    const scheduler = new WorkflowScheduler(engine, { store })
+    try {
+      const tasks = scheduler.list().filter(t => t.type === 'workflow')
+      if (tasks.length === 0) return 'Scheduled workflows:\n  No scheduled workflows.'
+      return 'Scheduled workflows:\n' + tasks.map(t => {
+        const defId = (t.payload?.definitionId as string) ?? 'unknown'
+        const time = t.runAt ? `at ${t.runAt.toISOString()}` : `cron ${t.cron}`
+        return `  [${t.id}] workflow ${defId} — ${t.status} — ${time}`
+      }).join('\n')
+    } finally {
+      scheduler.stop()
+    }
+  }
+
+  if (input.cancel) {
+    const engine = new WorkflowEngine(provider)
+    const scheduler = new WorkflowScheduler(engine, { store })
+    try {
+      return scheduler.cancel(input.cancel) ? `Cancelled: ${input.cancel}` : `Task not found: ${input.cancel}`
+    } finally {
+      scheduler.stop()
+    }
+  }
+
+  if (input.at && input.cron) {
+    return 'Error: Specify only one of --at or --cron.'
+  }
+  if (!input.at && !input.cron) {
+    return 'Error: Specify --at or --cron.'
+  }
+  if (!input.file) {
+    return 'Usage: workflow schedule <file> --at <time> | --cron <expr>'
+  }
+
+  let runAt: Date | undefined
+  if (input.at) {
+    runAt = new Date(input.at)
+    if (isNaN(runAt.getTime())) {
+      return `Error: Invalid --at value: ${input.at}`
+    }
+  }
+
+  if (input.cron && !isValidCron(input.cron)) {
+    return `Error: Invalid --cron value: ${input.cron}`
+  }
+
+  let definition: WorkflowDefinition
+  try {
+    const content = readFileSync(input.file, 'utf-8')
+    definition = JSON.parse(content) as WorkflowDefinition
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err)
+    return `Error: Invalid workflow JSON: ${msg}`
+  }
+
+  const validation = validateWorkflow(definition)
+  if (validation) {
+    return `Error: Invalid workflow: ${validation}`
+  }
+
+  const engine = new WorkflowEngine(provider)
+  const scheduler = new WorkflowScheduler(engine, { store })
+  try {
+    const task = scheduler.scheduleWorkflow({
+      definition,
+      runAt,
+      cron: input.cron,
+    })
+    const time = runAt ? `at ${runAt.toISOString()}` : `cron ${input.cron}`
+    return `Scheduled: ${task.id}\n  workflow: ${definition.id}\n  ${time}`
+  } finally {
+    scheduler.stop()
+  }
+}
+
+function isValidCron(cron: string): boolean {
+  const parts = cron.split(' ')
+  return parts.length === 5 && parts.every(p => /^[\d*,/-]+$/.test(p))
 }
 
 function formatOutput(output: Record<string, unknown>): string {

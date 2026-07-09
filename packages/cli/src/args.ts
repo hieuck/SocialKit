@@ -50,10 +50,33 @@ export function parseArgs(argv: string[]): ParsedArgs {
   }
 
   if (cmd === 'workflow') {
+    const subcommand = argv[1] ?? ''
+    if (subcommand === 'schedule') {
+      if (argv[2] === 'list') {
+        return {
+          command: 'workflow',
+          payload: { subcommand: 'schedule', list: 'true' },
+        }
+      }
+      if (argv[2] === 'cancel') {
+        return {
+          command: 'workflow',
+          payload: { subcommand: 'schedule', cancel: argv[3] ?? '' },
+        }
+      }
+      return {
+        command: 'workflow',
+        payload: {
+          subcommand: 'schedule',
+          file: argv[2] ?? '',
+          ...parseFlags(argv.slice(3)),
+        },
+      }
+    }
     return {
       command: 'workflow',
       payload: {
-        subcommand: argv[1] ?? '',
+        subcommand,
         file: argv[2] ?? '',
         ...parseFlags(argv.slice(3)),
       },

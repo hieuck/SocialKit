@@ -138,4 +138,37 @@ describe('Cli', () => {
 
     rmSync(dir, { recursive: true, force: true })
   })
+
+  it('schedules a workflow through Cli', async () => {
+    const dir = mkdtempSync(join(tmpdir(), 'cli-workflow-schedule-test-'))
+    const file = join(dir, 'workflow.json')
+    writeFileSync(file, JSON.stringify({
+      id: 'announce',
+      name: 'Announce',
+      steps: [{ id: 'post1', action: 'post', inputs: { pageId: 'p1', message: 'Hello' } }],
+    }))
+
+    const registry = new ProviderRegistry()
+    registry.register('facebook', () => new MockSocialProvider())
+    const session = testSession()
+    session.save('facebook', 'tok')
+
+    const cli = new Cli({ session, registry })
+    const result = await cli.run(['workflow', 'schedule', file, '--at', '2099-01-01T00:00:00Z'])
+    expect(result).toContain('Scheduled:')
+    expect(result).toContain('workflow: announce')
+
+    rmSync(dir, { recursive: true, force: true })
+  })
+
+  it('lists scheduled workflows through Cli', async () => {
+    const registry = new ProviderRegistry()
+    registry.register('facebook', () => new MockSocialProvider())
+    const session = testSession()
+    session.save('facebook', 'tok')
+
+    const cli = new Cli({ session, registry })
+    const result = await cli.run(['workflow', 'schedule', 'list'])
+    expect(result).toContain('Scheduled workflows')
+  })
 })

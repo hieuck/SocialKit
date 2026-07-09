@@ -70,8 +70,27 @@ socialkit workflow run ./workflows/announce.json --platform facebook
 - `apps/desktop` was missing `react` and `react-dom` devDependencies; tests failed to resolve `react/jsx-runtime`.
 - `TerminalPanel` tests produced `act(...)` warnings because async state updates were not awaited.
 
+## 2026-07-08 — Workflow Schedule CLI Command
+
+### What was built
+
+Added `socialkit workflow schedule`, `workflow schedule list`, and `workflow schedule cancel` commands. Workflows can be scheduled for one-time (`--at`) or recurring (`--cron`) execution using `WorkflowScheduler` with a `TaskStore` persisted next to the session file.
+
+### Key files
+
+- `packages/cli/src/workflow.ts` — `scheduleWorkflowCommand` and `WorkflowScheduleInput`
+- `packages/cli/src/cli.ts` — routes schedule/list/cancel subcommands
+- `packages/cli/src/session.ts` — exposes `getFilePath()` so the CLI can derive `tasks.json` path
+- `packages/automation/src/workflow-scheduler.ts` — accepts `SchedulerOptions` (enables TaskStore)
+- `packages/cli/__tests__/workflow.test.ts` and `packages/cli/__tests__/cli.test.ts` — schedule tests
+
+### Decisions
+
+- Schedule/list/cancel share the same `TaskStore` derived from the session file path, so tasks persist across CLI invocations.
+- `--at` and `--cron` validation happens before reading the workflow file, giving clearer error messages.
+- `WorkflowScheduler` now accepts `SchedulerOptions` to pass a `TaskStore`, keeping the change minimal and backward-compatible.
+
 ### Open gaps
 
 - Root `package.json` advertises `pnpm -r lint` but no `lint` script exists in any package.
-- No CLI command schedules workflows yet (could add `workflow schedule` in a follow-up).
 - No built-in workflow templates yet.
