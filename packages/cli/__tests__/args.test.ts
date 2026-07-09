@@ -68,4 +68,34 @@ describe('parseArgs', () => {
     expect(result.payload.file).toBe('./workflow.json')
     expect(result.payload.platform).toBe('facebook')
   })
+
+  it('parses "workflow schedule" command with --at', () => {
+    const result = parseArgs(['workflow', 'schedule', './w.json', '--at', '2026-07-09T09:00:00Z', '--platform', 'facebook'])
+    expect(result.command).toBe('workflow')
+    expect(result.payload.subcommand).toBe('schedule')
+    expect(result.payload.file).toBe('./w.json')
+    expect(result.payload.at).toBe('2026-07-09T09:00:00Z')
+    expect(result.payload.platform).toBe('facebook')
+  })
+
+  it('parses "workflow schedule" command with --cron', () => {
+    const result = parseArgs(['workflow', 'schedule', './w.json', '--cron', '0 9 * * 1'])
+    expect(result.command).toBe('workflow')
+    expect(result.payload.subcommand).toBe('schedule')
+    expect(result.payload.cron).toBe('0 9 * * 1')
+  })
+
+  it('parses "workflow schedule list" subcommand', () => {
+    const result = parseArgs(['workflow', 'schedule', 'list'])
+    expect(result.command).toBe('workflow')
+    expect(result.payload.subcommand).toBe('schedule')
+    expect(result.payload.list).toBe('true')
+  })
+
+  it('parses "workflow schedule cancel" subcommand', () => {
+    const result = parseArgs(['workflow', 'schedule', 'cancel', 'task_123'])
+    expect(result.command).toBe('workflow')
+    expect(result.payload.subcommand).toBe('schedule')
+    expect(result.payload.cancel).toBe('task_123')
+  })
 })
