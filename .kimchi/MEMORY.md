@@ -25,8 +25,38 @@ Steps may declare `onSuccess` and `onFailure` step ids. When a step throws, the 
 ### Testing
 
 - 53 tests in `@socialkit/automation` (was 38)
-- Full workspace: 218 tests passed
+- Full workspace: 224 tests passed
 - Build passes for all packages
+
+## 2026-07-08 — Workflow Run CLI Command
+
+### What was built
+
+Added `socialkit workflow run <file> [--platform <platform>]` to `@socialkit/cli`, exposing the `WorkflowEngine` directly from the command line.
+
+### Key files
+
+- `packages/cli/src/workflow.ts` — `workflowCommand` and `WorkflowInput`
+- `packages/cli/src/args.ts` — parses `workflow run <file>` and `--platform`
+- `packages/cli/src/cli.ts` — wires command into `Cli.run`
+- `packages/cli/__tests__/workflow.test.ts` — unit tests
+- `packages/cli/__tests__/cli.test.ts` — integration tests
+
+### Usage
+
+```bash
+socialkit workflow run ./workflows/announce.json --platform facebook
+```
+
+### Decisions
+
+- Kept workflow file validation minimal (`id`, `steps` array with `id` and `action`).
+- Execution failures are reported in the CLI output, not thrown, consistent with other CLI commands.
+- `--platform` overrides the active session platform.
+
+### Also fixed
+
+- Desktop production build failed because `src/types/window-mock.d.ts` (Jest-only global augmentation) was included in `tsc`. Moved it to `apps/desktop/types/window-mock.d.ts` and included it only in `tsconfig.test.json`.
 
 ### Decisions
 
@@ -43,4 +73,5 @@ Steps may declare `onSuccess` and `onFailure` step ids. When a step throws, the 
 ### Open gaps
 
 - Root `package.json` advertises `pnpm -r lint` but no `lint` script exists in any package.
-- No CLI command exposes workflow execution yet (could add `workflow run` in a follow-up).
+- No CLI command schedules workflows yet (could add `workflow schedule` in a follow-up).
+- No built-in workflow templates yet.
