@@ -8,9 +8,11 @@ import { postCommand } from './post.js'
 import { scheduleCommand } from './schedule.js'
 import { daemonCommand } from './daemon.js'
 import { configureCommand } from './configure.js'
-import { workflowCommand } from './workflow.js'
+import { workflowCommand, scheduleWorkflowCommand } from './workflow.js'
 import { Config } from './config.js'
 import { autoLoginFacebook } from './auto-login.js'
+import { TaskStore } from '@socialkit/automation'
+import { dirname, join } from 'path'
 
 export interface CliOptions {
   session: Session
@@ -72,6 +74,10 @@ export class Cli {
       '  socialkit configure <platform> <k> <v>  Set config value',
       '  socialkit workflow run <file>           Run a workflow JSON file',
       '  socialkit workflow run <file> --platform <platform>',
+      '  socialkit workflow schedule <file> --at <time>',
+      '  socialkit workflow schedule <file> --cron <expr>',
+      '  socialkit workflow schedule list',
+      '  socialkit workflow schedule cancel <taskId>',
     ].join('\n')
   }
 
@@ -148,6 +154,20 @@ export class Cli {
     if (!platform) return 'Specify a platform with --platform or log in first.'
     const provider = this.options.registry.get(platform)
     if (!provider) return `Unknown platform: ${platform}`
+
+    const store = new TaskStore(join(dirname(this.options.session.getFilePath()), 'tasks.json'))
+
+    if (payload.subcommand === 'schedule') {
+      return scheduleWorkflowCommand(provider, {
+        subcommand: 'schedule',
+        file: payload.file,
+        at: payload.at,
+        cron: payload.cron,
+        list: payload.list,
+        cancel: payload.cancel,
+      }, store)
+    }
+
     return workflowCommand(provider, {
       subcommand: payload.subcommand,
       file: payload.file,

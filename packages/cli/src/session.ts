@@ -35,6 +35,10 @@ export class Session {
     this.persist()
   }
 
+  getFilePath(): string {
+    return this.filePath
+  }
+
   private load(): SessionData {
     if (!existsSync(this.filePath)) return { tokens: {} }
     try {
